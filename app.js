@@ -1,4 +1,8 @@
 // app.js
+const filtroColaborador = document.getElementById("filtro-colaborador");
+const filtroStatus = document.getElementById("filtro-status");
+
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
@@ -49,20 +53,56 @@ form.addEventListener("submit", async (e) => {
 });
 
 // Exibir tarefas em tempo real
-onSnapshot(tasksCol, (snapshot) => {
+onSnapshot(tasksCol, snapshot => {
   dashboard.innerHTML = "";
+
+  // Coletar dados brutos
+  let tarefas = [];
+  let colaboradoresSet = new Set();
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    tarefas.push({ id: doc.id, ...data });
+    colaboradoresSet.add(data.assignee);
+  });
+
+  // Preencher filtro de colaborador (evita duplicação)
+  filtroColaborador.innerHTML = `<option value="">Todos os colaboradores</option>`;
+  colaboradoresSet.forEach(nome => {
+    const opt = document.createElement("option");
+    opt.value = nome;
+    opt.textContent = nome;
+    filtroColaborador.appendChild(opt);
+  });
+
+  // Aplicar filtros
+  const filtroColab = filtroColaborador.value;
+  const filtroStat = filtroStatus.value;
+
+  let filtradas = tarefas.filter(t => {
+    return (!filtroColab || t.assignee === filtroColab) &&
+           (!filtroStat || t.status === filtroStat);
+  });
+
   // Contadores
-let total = 0, pendente = 0, andamento = 0, concluida = 0;
+  let total = 0, pendente = 0, andamento = 0, concluida = 0;
+  filtradas.forEach(t => {
+    total++;
+    if (t.status === "Pendente") pendente++;
+    else if (t.status === "Em andamento") andamento++;
+    else if (t.status === "Concluída") concluida++;
 
-snapshot.forEach(doc => {
-  const data = doc.data();
-  total++;
-  if (data.status === "Pendente") pendente++;
-  else if (data.status === "Em andamento") andamento++;
-  else if (data.status === "Concluída") concluida++;
+    // Criar doc fake para renderTask
+    renderTask({ id: t.id, data: () => t });
+  });
 
-  renderTask(doc);
+  // Atualizar indicadores
+  document.getElementById("total").textContent = `Total: ${total}`;
+  document.getElementById("pendente").textContent = `Pendente: ${pendente}`;
+  document.getElementById("andamento").textContent = `Em andamento: ${andamento}`;
+  document.getElementById("concluida").textContent = `Concluída: ${concluida}`;
 });
+
 
 // Atualizar indicadores
 document.getElementById("total").textContent = `Total: ${total}`;
