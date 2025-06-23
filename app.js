@@ -51,8 +51,25 @@ form.addEventListener("submit", async (e) => {
 // Exibir tarefas em tempo real
 onSnapshot(tasksCol, (snapshot) => {
   dashboard.innerHTML = "";
-  snapshot.forEach((docSnap) => {
-    renderTask(docSnap);
+  // Contadores
+let total = 0, pendente = 0, andamento = 0, concluida = 0;
+
+snapshot.forEach(doc => {
+  const data = doc.data();
+  total++;
+  if (data.status === "Pendente") pendente++;
+  else if (data.status === "Em andamento") andamento++;
+  else if (data.status === "Concluída") concluida++;
+
+  renderTask(doc);
+});
+
+// Atualizar indicadores
+document.getElementById("total").textContent = `Total: ${total}`;
+document.getElementById("pendente").textContent = `Pendente: ${pendente}`;
+document.getElementById("andamento").textContent = `Em andamento: ${andamento}`;
+document.getElementById("concluida").textContent = `Concluída: ${concluida}`;
+
   });
 });
 
