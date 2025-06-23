@@ -66,6 +66,19 @@ onSnapshot(tasksCol, snapshot => {
     colaboradoresSet.add(data.assignee);
   });
 
+  filtroColaborador.addEventListener("change", () => {
+  loadTasksAgain(); // força atualização
+});
+filtroStatus.addEventListener("change", () => {
+  loadTasksAgain(); // idem
+});
+
+// função auxiliar que reinicializa a leitura
+function loadTasksAgain() {
+  // não faz nada, pois o onSnapshot já está em tempo real
+  // ao mudar os valores dos selects, ele atualiza automaticamente
+}
+
   // Preencher filtro de colaborador (evita duplicação)
   filtroColaborador.innerHTML = `<option value="">Todos os colaboradores</option>`;
   colaboradoresSet.forEach(nome => {
