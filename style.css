@@ -80,3 +80,17 @@ form button {
 .indicador.andamento { border-left-color: #ffc107; }
 .indicador.concluida { border-left-color: #28a745; }
 
+#filtros {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+#filtros select {
+  padding: 6px;
+  font-size: 1em;
+}
+
+
