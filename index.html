@@ -1,3 +1,45 @@
----
-layout: front
----
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestão de Tarefas – Colegiado Uesc</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.33.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.33.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestão de Tarefas – Colegiado Uesc</h1>
+
+    <form id="task-form">
+      <input type="text" id="title" placeholder="Título da tarefa" required>
+      <input type="text" id="type" placeholder="Tipo (e.g. Reunião, Relatório)" required>
+      <input type="text" id="assignee" placeholder="Atribuído a" required>
+      <input type="date" id="due-date" required>
+      <select id="priority" required>
+        <option value="" disabled selected>Prioridade</option>
+        <option value="Baixa">Baixa</option>
+        <option value="Média">Média</option>
+        <option value="Alta">Alta</option>
+      </select>
+      <textarea id="notes" placeholder="Observações"></textarea>
+      <select id="status" required>
+        <option value="" disabled selected>Status</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Concluída">Concluída</option>
+      </select>
+      <button type="submit">Adicionar/Atualizar Tarefa</button>
+    </form>
+
+    <h2>Dashboard de Tarefas</h2>
+    <div id="dashboard">
+      <!-- Cards de tarefas vão aparecer aqui -->
+    </div>
+  </div>
+
+<script type="module" src="app.js"></script>
+  
+</body>
+</html>
