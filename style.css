@@ -57,3 +57,26 @@ form button {
   font-size: 0.9em;
   cursor: pointer;
 }
+
+#indicadores {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.indicador {
+  flex: 1 1 150px;
+  background-color: #f8f9fa;
+  border-left: 6px solid #ccc;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.indicador.pendente { border-left-color: #dc3545; }
+.indicador.andamento { border-left-color: #ffc107; }
+.indicador.concluida { border-left-color: #28a745; }
+
