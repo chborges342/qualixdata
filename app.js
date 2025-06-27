@@ -20,8 +20,12 @@ const form = document.getElementById("task-form");
 const colabForm = document.getElementById("colaborador-form");
 const assigneeSelect = document.getElementById("assignee");
 const dashboard = document.getElementById("dashboard");
-const filtroColaborador = document.getElementById("filtro-colaborador");
-const filtroStatus = document.getElementById("filtro-status");
+const filtroColaborador.addEventListener("change", () => {
+  dashboard.innerHTML = ""; // Limpa dashboard
+});
+const filtroStatus.addEventListener("change", () => {
+  dashboard.innerHTML = "";
+});
 
 // Cadastrar colaborador
 colabForm.addEventListener("submit", async (e) => {
