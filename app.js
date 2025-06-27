@@ -1,4 +1,4 @@
-// app.js
+// app.js atualizado
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
@@ -20,12 +20,8 @@ const form = document.getElementById("task-form");
 const colabForm = document.getElementById("colaborador-form");
 const assigneeSelect = document.getElementById("assignee");
 const dashboard = document.getElementById("dashboard");
-const filtroColaborador.addEventListener("change", () => {
-  dashboard.innerHTML = ""; // Limpa dashboard
-});
-const filtroStatus.addEventListener("change", () => {
-  dashboard.innerHTML = "";
-});
+const filtroColaborador = document.getElementById("filtro-colaborador");
+const filtroStatus = document.getElementById("filtro-status");
 
 // Cadastrar colaborador
 colabForm.addEventListener("submit", async (e) => {
@@ -55,7 +51,7 @@ onSnapshot(colaboradoresCol, snapshot => {
   });
 });
 
-// Envio real de e-mail com EmailJS
+// Envio de e-mail com EmailJS
 async function enviarEmailParaColaborador(nome, dadosTarefa) {
   const q = query(colaboradoresCol, where("nome", "==", nome));
   const snap = await getDocs(q);
@@ -113,7 +109,6 @@ onSnapshot(tarefasCol, async snapshot => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    // Atualizar status para 'Pendente' se a data estiver vencida
     if (data.status !== "Concluída" && data.dueDate < hoje && data.status !== "Pendente") {
       await updateDoc(doc(db, "tarefas", id), { status: "Pendente" });
       data.status = "Pendente";
@@ -199,5 +194,10 @@ window.deleteTask = async (id) => {
   }
 };
 
-filtroColaborador.addEventListener("change", () => {});
-filtroStatus.addEventListener("change", () => {});
+filtroColaborador.addEventListener("change", () => {
+  dashboard.innerHTML = "";
+});
+
+filtroStatus.addEventListener("change", () => {
+  dashboard.innerHTML = "";
+});
