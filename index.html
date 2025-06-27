@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestão de Tarefas</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- EmailJS -->
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("cd8b901fc52511cf4311f3cdb38833f6"); // Public Key da sua conta EmailJS
+    })();
+  </script>
+</head>
+<body>
+  <h1>Gestão de Tarefas - Colegiado Economia UESC</h1>
+
+  <section>
+    <form id="colaborador-form">
+      <h2>Cadastro de Colaborador</h2>
+      <input type="text" id="colab-nome" placeholder="Nome" required>
+      <input type="email" id="colab-email" placeholder="Email" required>
+      <button type="submit">Cadastrar</button>
+    </form>
+  </section>
+
+  <section>
+    <form id="task-form">
+      <h2>Criar / Editar Tarefa</h2>
+      <input type="text" name="title" placeholder="Título da Tarefa" required>
+      <select name="type" required>
+        <option value="">Tipo da Tarefa</option>
+        <option>Aproveitamento</option>
+        <option>AACC</option>
+        <option>Trancamento</option>
+        <option>Retorno</option>
+        <option>Agendamento/Defesa de Monografia</option>
+        <option>Consepe</option>
+        <option>Exercício domiciliar</option>
+        <option>Estágio</option>
+        <option>Curricularização da Extensão</option>
+        <option>Solicitação Veículo/transporte</option>
+        <option>Comunicação outras unidades</option>
+        <option>Outros</option>
+      </select>
+      <select name="assignee" id="assignee" required></select>
+      <input type="date" name="due-date" required>
+      <select name="priority" required>
+        <option value="">Prioridade</option>
+        <option>Alta</option>
+        <option>Média</option>
+        <option>Baixa</option>
+      </select>
+      <textarea name="notes" placeholder="Observações"></textarea>
+      <select name="status" required>
+        <option>Pendente</option>
+        <option>Em andamento</option>
+        <option>Concluída</option>
+      </select>
+      <button type="submit">Salvar Tarefa</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Filtrar Tarefas</h2>
+    <select id="filtro-colaborador"></select>
+    <select id="filtro-status">
+      <option value="">Todos os status</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Em andamento">Em andamento</option>
+      <option value="Concluída">Concluída</option>
+    </select>
+  </section>
+
+  <section>
+    <h2>Painel de Tarefas</h2>
+    <div id="dashboard"></div>
+    <div id="status-contagem">
+      <p id="total"></p>
+      <p id="pendente"></p>
+      <p id="andamento"></p>
+      <p id="concluida"></p>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

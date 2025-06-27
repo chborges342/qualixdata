@@ -66,7 +66,7 @@ async function enviarEmailParaColaborador(nome, dadosTarefa) {
       priority: dadosTarefa.priority,
     };
 
-    emailjs.send("SEU_SERVICE_ID", "SEU_TEMPLATE_ID", templateParams)
+    emailjs.send("service_wr60caj", "template_867suuy", templateParams)
       .then(() => console.log("Email enviado com sucesso."))
       .catch((error) => console.error("Erro ao enviar email:", error));
   }
