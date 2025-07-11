@@ -2055,8 +2055,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initImpressao();
     initFirebaseListeners();
 
-    // Inicialização quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', initApp);
+    
     
     console.log('Sistema de Gestão de Horários inicializado com sucesso!');
 });
