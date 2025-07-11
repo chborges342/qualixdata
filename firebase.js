@@ -2,44 +2,35 @@
 // Este arquivo é um módulo, por isso precisa das importações
 
 
-// Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+// firebase.js - Versão simplificada e compatível
 
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBKVphDXSCKgJ0onyebhD2FQ_gK5fALQhg",
+  authDomain: "sistemahorarios-de981.firebaseapp.com",
+  databaseURL: "https://sistemahorarios-de981.firebaseio.com", // Adicione esta linha
+  projectId: "sistemahorarios-de981",
+  storageBucket: "sistemahorarios-de981.firebasestorage.app",
+  messagingSenderId: "647390917543",
+  appId: "1:647390917543:web:848a6f24bf012260407c82"
+};
 
+// Inicializa o Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-// TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBKVphDXSCKgJ0onyebhD2FQ_gK5fALQhg",
-    authDomain: "sistemahorarios-de981.firebaseapp.com",
-    projectId: "sistemahorarios-de981",
-    storageBucket: "sistemahorarios-de981.firebasestorage.app",
-    messagingSenderId: "647390917543",
-    appId: "1:647390917543:web:848a6f24bf012260407c82"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-
-// Obtém uma referência para o Realtime Database
-const database = getDatabase(app);
-
-// Para o timestamp do servidor no Realtime Database, usa-se este objeto literal especial
-const ServerValueTimestamp = { ".sv": "timestamp" };
-
-// Torna as funções e a instância do database acessíveis globalmente
-// para que o script.js possa utilizá-los sem precisar importá-los novamente.
-// Isso simplifica a interconexão entre este módulo e o script.js
+// Exporta funções essenciais para o escopo global
 window.firebaseDB = database;
-window.dbRef = ref;
-window.dbPush = push;
-window.dbSet = set;
-window.dbOnValue = onValue;
-window.dbRemove = remove;     // Expondo para futuras operações de exclusão (se precisar)
-window.dbUpdate = update;     // Expondo para futuras operações de atualização (se precisar)
-window.dbServerTimestamp = ServerValueTimestamp;
+window.dbRef = (path) => firebase.database().ref(path);
+window.dbPush = (ref) => firebase.database().ref(ref).push();
+window.dbSet = (ref, data) => firebase.database().ref(ref).set(data);
+window.dbOnValue = (ref, callback) => firebase.database().ref(ref).on('value', callback);
+window.dbRemove = (ref) => firebase.database().ref(ref).remove();
+window.dbUpdate = (ref, data) => firebase.database().ref(ref).update(data);
+window.dbServerTimestamp = firebase.database.ServerValue.TIMESTAMP;
 
-console.log("Firebase Database inicializado e funções exportadas para 'window'.");
+console.log("Firebase inicializado com sucesso. Funções disponíveis:");
+console.log("- firebaseDB", window.firebaseDB);
+console.log("- dbRef()", window.dbRef);
+console.log("- dbPush()", window.dbPush);
+console.log("- dbSet()", window.dbSet);
