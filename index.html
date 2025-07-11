@@ -463,6 +463,23 @@
                             </button>
                         </div>
                     </div>
+                    
+                    <!-- NOVO CARTÃO DE IMPRESSÃO -->
+                    <div class="option-card">
+                        <div class="option-header">
+                            <i class="fas fa-list-ol"></i>
+                            <h3>Lista de Disciplinas</h3>
+                        </div>
+                        <div class="option-content">
+                            <p>Gera uma lista com todas as disciplinas alocadas em horários, organizadas por semestre.</p>
+                            <button class="btn btn-primary" id="btn-print-disciplinas-alocadas" style="margin-top: 1rem;">
+                                <i class="fas fa-print"></i>
+                                Gerar Lista de Disciplinas
+                            </button>
+                        </div>
+                    </div>
+                    <!-- FIM DO NOVO CARTÃO -->
+
                 </div>
 
                 <div id="print-preview" class="print-preview">
@@ -477,31 +494,9 @@
         </div>
     </div>
 
-        <!-- Alerts Container -->
-        <div id="alerts-container" class="alerts-container">
-            <!-- Alertas serão exibidos aqui -->
-        </div>
-    </div>
-
- <!-- Firebase (ORDEM CRÍTICA) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="firebase.js"></script>
-    
-    <!-- Seu script principal -->
-    <script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+<script src="script.js" defer></script>
 
 </body>
 </html>
 
-
-
-
-
-
-
-
-
-
-
- 
