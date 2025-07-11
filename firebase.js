@@ -1,6 +1,14 @@
-// Substitua TODO o conteúdo do firebase.js por:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+import { 
+    getDatabase, 
+    ref as dbRef, 
+    push as dbPush,
+    set as dbSet,
+    onValue as dbOnValue,
+    remove as dbRemove,
+    update as dbUpdate,
+    serverTimestamp as dbServerTimestamp
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBKVphDXSCKgJ0onyebhD2FQ_gK5fALQhg",
@@ -11,19 +19,18 @@ const firebaseConfig = {
     appId: "1:647390917543:web:848a6f24bf012260407c82"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const firebaseDB = getDatabase(app);
 
-// Exporte explicitamente cada função necessária
-export const db = {
-    database,
-    ref: (path) => ref(database, path),
-    push,
-    set,
-    onValue,
-    remove,
-    update,
-    serverTimestamp: { '.sv': 'timestamp' }
-};
+// Disponibiliza as funções no escopo global para compatibilidade com seu script.js
+window.firebaseDB = firebaseDB;
+window.dbRef = dbRef;
+window.dbPush = dbPush;
+window.dbSet = dbSet;
+window.dbOnValue = dbOnValue;
+window.dbRemove = dbRemove;
+window.dbUpdate = dbUpdate;
+window.dbServerTimestamp = dbServerTimestamp;
 
-console.log("Firebase configurado com sucesso!");
+console.log("Firebase configurado com sucesso! Funções disponíveis globalmente.");
