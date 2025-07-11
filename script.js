@@ -789,3 +789,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Sistema de Gestão de Horários inicializado com sucesso!');
 });
+
+console.log("Firebase carregado?", typeof firebase !== 'undefined');
+console.log("Configuração disponível?", window.firebaseDB !== undefined);
