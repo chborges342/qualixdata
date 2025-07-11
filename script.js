@@ -2044,7 +2044,7 @@ function initFirebaseListeners() {
     console.log("Listeners do Firebase inicializados. Dados serão sincronizados automaticamente.");
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
     initNavigation();
     initTabs();
     initProfessores();
@@ -2054,8 +2054,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initHorarios();
     initImpressao();
     initFirebaseListeners();
+}
 
-    
-    
-    console.log('Sistema de Gestão de Horários inicializado com sucesso!');
-});
+// Inicialização quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initApp);
