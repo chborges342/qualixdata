@@ -766,8 +766,18 @@ function closePrintPreview() {
 
 // [As demais funções permanecem como no seu código original]
 
-// Initialize app
+// ... [todo o restante do seu código] ...
+
+// Initialize app - MOVER ESTA PARTE PARA O FINAL DO ARQUIVO
 document.addEventListener('DOMContentLoaded', () => {
+    // Verifica se o Firebase está carregado
+    if (typeof window.firebaseDB !== 'undefined') {
+        console.log('Firebase está disponível, inicializando listeners...');
+        initFirebaseListeners();
+    } else {
+        console.error('Firebase não está disponível');
+    }
+
     initNavigation();
     initTabs();
     initProfessores();
@@ -776,7 +786,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initSalas();
     initHorarios();
     initImpressao();
-    initFirebaseListeners();
     
     console.log('Sistema de Gestão de Horários inicializado com sucesso!');
 });
