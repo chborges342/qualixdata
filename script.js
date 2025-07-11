@@ -2042,6 +2042,7 @@ function initFirebaseListeners() {
     });
 
     console.log("Listeners do Firebase inicializados. Dados serão sincronizados automaticamente.");
+    } 
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
