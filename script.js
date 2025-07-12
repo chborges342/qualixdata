@@ -1689,33 +1689,42 @@ function generateDisciplinasPrint(turnoSelecionado = 'todos') {
 
 // Atualize a função initImpressao para incluir o novo botão
 function initImpressao() {
+    // Verifica se estamos na página de impressão
+    if (!document.getElementById('impressao')) return;
+
+    // Elementos com verificação de existência
     const printTurmaBtn = document.getElementById('btn-print-turma');
     const printProfessorBtn = document.getElementById('btn-print-professor');
     const printDisciplinasBtn = document.getElementById('btn-print-disciplinas');
-    
-    printTurmaBtn.addEventListener('click', () => {
-        const turmaId = document.getElementById('print-turma').value;
-        if (!turmaId) {
-            showAlert('Selecione uma turma', 'warning');
-            return;
-        }
-        generateTurmaPrint(turmaId);
-    });
-    
-    printProfessorBtn.addEventListener('click', () => {
-        const professorId = document.getElementById('print-professor').value;
-        if (!professorId) {
-            showAlert('Selecione um professor', 'warning');
-            return;
-        }
-        generateProfessorPrint(professorId);
-    });
-    
-     printDisciplinasBtn.addEventListener('click', atualizarListaDisciplinas);
-    document.getElementById('print-turno').addEventListener('change', atualizarListaDisciplinas);
-}
+    const printTurnoSelect = document.getElementById('print-turno');
 
-// [As demais funções permanecem as mesmas...]
+    if (printTurmaBtn) {
+        printTurmaBtn.addEventListener('click', () => {
+            const turmaId = document.getElementById('print-turma').value;
+            if (!turmaId) {
+                showAlert('Selecione uma turma', 'warning');
+                return;
+            }
+            generateTurmaPrint(turmaId);
+        });
+    }
+
+    if (printProfessorBtn) {
+        printProfessorBtn.addEventListener('click', () => {
+            const professorId = document.getElementById('print-professor').value;
+            if (!professorId) {
+                showAlert('Selecione um professor', 'warning');
+                return;
+            }
+            generateProfessorPrint(professorId);
+        });
+    }
+
+    if (printDisciplinasBtn && printTurnoSelect) {
+        printDisciplinasBtn.addEventListener('click', atualizarListaDisciplinas);
+        printTurnoSelect.addEventListener('change', atualizarListaDisciplinas);
+    }
+}
 
 function generateTurmaPrint(turmaId) {
     const turma = appData.turmas[turmaId];
