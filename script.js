@@ -1545,11 +1545,11 @@ document.addEventListener('contextmenu', (e) => {
 
 function atualizarListaDisciplinas() {
     const turnoSelecionado = document.getElementById('print-turno').value;
-    generateDisciplinasPrint(turnoSelecionado);
+    generateDisciplinasPrint(turnoSelecionado); // Agora passa o turno explicitamente
 }
 
 
-function generateDisciplinasPrint(turnoSelecionado = 'todos') {
+function generateDisciplinasPrint(turnoSelecionado) { // Remova o valor padrão 'todos'
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
     
