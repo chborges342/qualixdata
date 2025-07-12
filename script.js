@@ -1553,12 +1553,7 @@ function generateDisciplinasPrint(turnoSelecionado = 'todos') {
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
     
-    // Se não foi passado um turno, pega do select
-    if (turnoSelecionado === 'todos') {
-        turnoSelecionado = document.getElementById('print-turno').value;
-    }
-
-    // Filtra as disciplinas que estão alocadas em horários
+        // Filtra as disciplinas que estão alocadas em horários
     const disciplinasOfertadas = {};
     
     toArray(appData.horarios).forEach(horario => {
@@ -1716,7 +1711,8 @@ function initImpressao() {
         generateProfessorPrint(professorId);
     });
     
-    printDisciplinasBtn.addEventListener('click', generateDisciplinasPrint);
+     printDisciplinasBtn.addEventListener('click', atualizarListaDisciplinas);
+    document.getElementById('print-turno').addEventListener('change', atualizarListaDisciplinas);
 }
 
 // [As demais funções permanecem as mesmas...]
