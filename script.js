@@ -1544,100 +1544,126 @@ function generateDisciplinasPrint() {
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
     
-    // Converte para array e ordena por semestre
-    const disciplinasArray = toArray(appData.disciplinas).map(d => {
-        const primeiroSemestre = d.semestresPorTurno ? 
-            Object.values(d.semestresPorTurno)[0] || 0 : 0;
-        return {
-            ...d,
-            primeiroSemestre
-        };
-    }).sort((a, b) => a.primeiroSemestre - b.primeiroSemestre);
+    // Obter o turno selecionado (se houver)
+    const turnoSelecionado = document.getElementById('print-turno')?.value || 'todos';
     
-    let html = `
-        <div class="print-header">
-            <h2>Lista de Disciplinas - Ciências Econômicas UESC</h2>
-            <p>Organizado por semestre curricular</p>
-            <p>Gerado em: ${formatDateTime(new Date())}</p>
-        </div>
+    // Filtrar disciplinas que estão realmente alocadas em horários
+    const disciplinasOfertadas = {};
+    
+    toArray(appData.horarios).forEach(horario => {
+        const disciplina = appData.disciplinas[horario.idDisciplina];
+        const turma = appData.turmas[horario.idTurma];
+        const professor = appData.professores[horario.idProfessor];
         
-        <table class="print-table disciplinas-table">
-            <thead>
-                <tr>
-                    <th>Semestre</th>
-                    <th>Código</th>
-                    <th>Disciplina</th>
-                    <th>Turma</th>
-                    <th>Professor</th>
-                    <th>Carga Horária</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    // Agrupa disciplinas por semestre
-    const disciplinasPorSemestre = {};
-    
-    disciplinasArray.forEach(disciplina => {
-        if (disciplina.turnos && disciplina.semestresPorTurno) {
-            disciplina.turnos.forEach(turno => {
-                const semestre = disciplina.semestresPorTurno[turno];
+        if (disciplina && turma && professor) {
+            // Verificar se o turno corresponde ao filtro
+            if (turnoSelecionado === 'todos' || turma.turno === turnoSelecionado) {
+                const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
                 
-                if (!disciplinasPorSemestre[semestre]) {
-                    disciplinasPorSemestre[semestre] = [];
+                if (!disciplinasOfertadas[disciplina.id]) {
+                    disciplinasOfertadas[disciplina.id] = {
+                        ...disciplina,
+                        semestre,
+                        turno: turma.turno,
+                        turmas: [],
+                        professores: new Set()
+                    };
                 }
                 
-                disciplinasPorSemestre[semestre].push({
-                    ...disciplina,
-                    turnoAtual: turno,
-                    semestreAtual: semestre
-                });
-            });
+                // Adicionar turma e professor (evitando duplicatas)
+                if (!disciplinasOfertadas[disciplina.id].turmas.includes(turma.nome)) {
+                    disciplinasOfertadas[disciplina.id].turmas.push(turma.nome);
+                }
+                disciplinasOfertadas[disciplina.id].professores.add(professor.nome);
+            }
         }
     });
     
-    // Ordena os semestres e gera as linhas
+    // Converter para array e ordenar por semestre
+    const disciplinasArray = Object.values(disciplinasOfertadas)
+        .sort((a, b) => a.semestre - b.semestre || a.nome.localeCompare(b.nome));
+    
+    // Agrupar por semestre
+    const disciplinasPorSemestre = {};
+    disciplinasArray.forEach(disciplina => {
+        if (!disciplinasPorSemestre[disciplina.semestre]) {
+            disciplinasPorSemestre[disciplina.semestre] = [];
+        }
+        disciplinasPorSemestre[disciplina.semestre].push(disciplina);
+    });
+    
+    // Gerar HTML
+    let html = `
+        <div class="print-header">
+            <h2>Lista de Disciplinas Ofertadas - Ciências Econômicas UESC</h2>
+            <p>Turno: ${turnoSelecionado === 'todos' ? 'Todos' : turnoSelecionado.charAt(0).toUpperCase() + turnoSelecionado.slice(1)}</p>
+            <p>Semestre: ${new Date().getFullYear()}.${new Date().getMonth() < 6 ? 1 : 2}</p>
+            <p>Gerado em: ${formatDateTime(new Date())}</p>
+        </div>
+        
+        <div class="print-controls">
+            <label for="print-turno">Filtrar por turno:</label>
+            <select id="print-turno" onchange="generateDisciplinasPrint()">
+                <option value="todos">Todos</option>
+                <option value="matutino">Matutino</option>
+                <option value="noturno">Noturno</option>
+            </select>
+        </div>
+        
+        <div class="disciplinas-container">
+    `;
+    
+    // Preencher select com o turno atual
+    const turnoSelect = document.getElementById('print-turno');
+    if (turnoSelect) {
+        turnoSelect.value = turnoSelecionado;
+    }
+    
+    // Gerar conteúdo por semestre
     Object.keys(disciplinasPorSemestre)
-        .sort((a, b) => parseInt(a) - parseInt(b))
-        .forEach(semestre => {
-            disciplinasPorSemestre[semestre].forEach(disciplina => {
-                const horariosDisciplina = toArray(appData.horarios)
-                    .filter(h => h.idDisciplina === disciplina.id);
-                
-                if (horariosDisciplina.length === 0) {
-                    html += `
-                        <tr>
-                            <td>${disciplina.semestreAtual}º</td>
-                            <td>${disciplina.codigo}</td>
-                            <td>${disciplina.nome}</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>${disciplina.cargaHoraria}h</td>
-                        </tr>
-                    `;
-                } else {
-                    horariosDisciplina.forEach(horario => {
-                        const turma = appData.turmas[horario.idTurma];
-                        const professor = appData.professores[horario.idProfessor];
-                        
-                        html += `
+        .sort()
+        .forEach((semestre, index) => {
+            const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
+            
+            html += `
+                <div class="semestre-group" style="background-color: ${bgColor};">
+                    <h3 class="semestre-title">${semestre}º Semestre</h3>
+                    <table class="print-table disciplinas-table">
+                        <thead>
                             <tr>
-                                <td>${disciplina.semestreAtual}º</td>
-                                <td>${disciplina.codigo}</td>
-                                <td>${disciplina.nome}</td>
-                                <td>${turma?.nome || '-'}</td>
-                                <td>${professor?.nome || '-'}</td>
-                                <td>${disciplina.cargaHoraria}h</td>
+                                <th>Código</th>
+                                <th>Disciplina</th>
+                                <th>Turmas</th>
+                                <th>Professor(es)</th>
+                                <th>C.H.</th>
+                                <th>Turno</th>
                             </tr>
-                        `;
-                    });
-                }
+                        </thead>
+                        <tbody>
+            `;
+            
+            disciplinasPorSemestre[semestre].forEach(disciplina => {
+                html += `
+                    <tr>
+                        <td>${disciplina.codigo}</td>
+                        <td>${disciplina.nome}</td>
+                        <td>${disciplina.turmas.join(', ')}</td>
+                        <td>${Array.from(disciplina.professores).join(', ')}</td>
+                        <td>${disciplina.cargaHoraria}h</td>
+                        <td>${disciplina.turno.charAt(0).toUpperCase() + disciplina.turno.slice(1)}</td>
+                    </tr>
+                `;
             });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
         });
     
-    html += `</tbody></table>`;
-    
     html += `
+        </div>
         <div class="print-footer">
             <button class="btn btn-primary" onclick="printPage()">
                 <i class="fas fa-print"></i>
@@ -1653,6 +1679,7 @@ function generateDisciplinasPrint() {
     preview.innerHTML = html;
     preview.scrollIntoView({ behavior: 'smooth' });
 }
+
 
 // Atualize a função initImpressao para incluir o novo botão
 function initImpressao() {
