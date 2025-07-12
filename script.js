@@ -2096,11 +2096,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initTurmas();
     initSalas();
     initHorarios();
-    initImpressao();
     
-    // Inicializa os listeners do Firebase. Isso substitui o loadData()
-    // O Firebase agora gerencia o carregamento inicial e as atualizações de dados.
-    initFirebaseListeners(); 
+    // Inicializa apenas se estiver na página de impressão
+    if (document.getElementById('impressao')) {
+        initImpressao();
+    }
     
-    console.log('Sistema de Gestão de Horários inicializado com sucesso e conectado ao Firebase!');
+    initFirebaseListeners();
+    console.log('Sistema inicializado!');
 });
