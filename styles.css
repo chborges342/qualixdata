@@ -1031,19 +1031,24 @@ body {
 }
 
 .print-controls {
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #f8f9fa;
+    background: #f8f9fa;
+    padding: 15px;
     border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .print-controls label {
-    margin-right: 10px;
-    font-weight: bold;
+    font-weight: 600;
+    color: #343a40;
 }
 
 .print-controls select {
-    padding: 5px;
-    border-radius: 4px;
+    padding: 8px 12px;
     border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
 }
