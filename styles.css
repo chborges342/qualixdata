@@ -1052,3 +1052,13 @@ body {
     background: white;
     cursor: pointer;
 }
+
+.print-controls select:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.print-controls select option:hover {
+    background-color: #e9ecef;
+}
