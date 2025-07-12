@@ -1544,10 +1544,10 @@ function generateDisciplinasPrint() {
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
     
-    // Obter o turno selecionado (se houver)
-    const turnoSelecionado = document.getElementById('print-turno')?.value || 'todos';
+    // Obter o turno selecionado
+    const turnoSelecionado = document.getElementById('print-turno').value;
     
-    // Filtrar disciplinas que estão realmente alocadas em horários
+    // Filtrar disciplinas que estão alocadas em horários
     const disciplinasOfertadas = {};
     
     toArray(appData.horarios).forEach(horario => {
@@ -1556,7 +1556,7 @@ function generateDisciplinasPrint() {
         const professor = appData.professores[horario.idProfessor];
         
         if (disciplina && turma && professor) {
-            // Verificar se o turno corresponde ao filtro
+            // Aplicar filtro de turno
             if (turnoSelecionado === 'todos' || turma.turno === turnoSelecionado) {
                 const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
                 
@@ -1570,7 +1570,6 @@ function generateDisciplinasPrint() {
                     };
                 }
                 
-                // Adicionar turma e professor (evitando duplicatas)
                 if (!disciplinasOfertadas[disciplina.id].turmas.includes(turma.nome)) {
                     disciplinasOfertadas[disciplina.id].turmas.push(turma.nome);
                 }
