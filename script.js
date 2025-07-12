@@ -1540,14 +1540,25 @@ document.addEventListener('contextmenu', (e) => {
 
 // ============ NOVA FUNCIONALIDADE: IMPRESSÃO DE DISCIPLINAS ============
 
-function generateDisciplinasPrint() {
+
+
+
+function atualizarListaDisciplinas() {
+    const turnoSelecionado = document.getElementById('print-turno').value;
+    generateDisciplinasPrint(turnoSelecionado);
+}
+
+
+function generateDisciplinasPrint(turnoSelecionado = 'todos') {
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
     
-    // Obter o turno selecionado
-    const turnoSelecionado = document.getElementById('print-turno').value;
-    
-    // Filtrar disciplinas que estão alocadas em horários
+    // Se não foi passado um turno, pega do select
+    if (turnoSelecionado === 'todos') {
+        turnoSelecionado = document.getElementById('print-turno').value;
+    }
+
+    // Filtra as disciplinas que estão alocadas em horários
     const disciplinasOfertadas = {};
     
     toArray(appData.horarios).forEach(horario => {
@@ -1556,15 +1567,16 @@ function generateDisciplinasPrint() {
         const professor = appData.professores[horario.idProfessor];
         
         if (disciplina && turma && professor) {
-            // Aplicar filtro de turno
-            if (turnoSelecionado === 'todos' || turma.turno === turnoSelecionado) {
-                const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
+            // Aplica o filtro de turno corretamente
+            const turnoTurma = turma.turno;
+            if (turnoSelecionado === 'todos' || turnoTurma === turnoSelecionado) {
+                const semestre = disciplina.semestresPorTurno?.[turnoTurma] || 0;
                 
                 if (!disciplinasOfertadas[disciplina.id]) {
                     disciplinasOfertadas[disciplina.id] = {
                         ...disciplina,
                         semestre,
-                        turno: turma.turno,
+                        turno: turnoTurma,
                         turmas: [],
                         professores: new Set()
                     };
