@@ -1626,13 +1626,13 @@ function generateDisciplinasPrint(turnoSelecionado) {
     
     // Gerar conteúdo por semestre
     Object.keys(disciplinasPorSemestre)
-        .sort()
-        .forEach((semestre, index) => {
-            const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
-            
-            html += `
-                <div class="semestre-group" style="background-color: ${bgColor};">
-                    <h3 class="semestre-title">${semestre}º Semestre</h3>
+    .sort((a, b) => parseInt(a) - parseInt(b)) // <-- Correção chave aqui
+    .forEach((semestre, index) => {
+        const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
+        
+        html += `
+            <div class="semestre-group" style="background-color: ${bgColor};">
+                <h3 class="semestre-title">${semestre}º Semestre</h3>
                     <table class="print-table disciplinas-table">
                         <thead>
                             <tr>
