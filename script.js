@@ -1549,11 +1549,15 @@ function atualizarListaDisciplinas() {
 }
 
 
-function generateDisciplinasPrint(turnoSelecionado) { // Remova o valor padrão 'todos'
+function generateDisciplinasPrint(turnoSelecionado) {
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
-    
-        // Filtra as disciplinas que estão alocadas em horários
+
+    // Debug: verifique o valor recebido
+    console.log("[DEBUG] Turno recebido para filtro:", turnoSelecionado);
+    console.log("[DEBUG] Turmas disponíveis:", toArray(appData.turmas).map(t => ({id: t.id, nome: t.nome, turno: t.turno})));
+
+    // Filtra as disciplinas que estão alocadas em horários
     const disciplinasOfertadas = {};
     
     toArray(appData.horarios).forEach(horario => {
@@ -1562,16 +1566,18 @@ function generateDisciplinasPrint(turnoSelecionado) { // Remova o valor padrão 
         const professor = appData.professores[horario.idProfessor];
         
         if (disciplina && turma && professor) {
-            // Aplica o filtro de turno corretamente
-            const turnoTurma = turma.turno;
-            if (turnoSelecionado === 'todos' || turnoTurma === turnoSelecionado) {
-                const semestre = disciplina.semestresPorTurno?.[turnoTurma] || 0;
+            // Aplica o filtro de turno corretamente (com comparação case-insensitive)
+            const turnoTurma = turma.turno?.toLowerCase(); // Converta para lowercase
+            const turnoFiltro = turnoSelecionado?.toLowerCase();
+            
+            if (turnoFiltro === 'todos' || turnoTurma === turnoFiltro) {
+                const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
                 
                 if (!disciplinasOfertadas[disciplina.id]) {
                     disciplinasOfertadas[disciplina.id] = {
                         ...disciplina,
                         semestre,
-                        turno: turnoTurma,
+                        turno: turma.turno, // Mantém o original para exibição
                         turmas: [],
                         professores: new Set()
                     };
@@ -1584,6 +1590,7 @@ function generateDisciplinasPrint(turnoSelecionado) { // Remova o valor padrão 
             }
         }
     });
+
     
     // Converter para array e ordenar por semestre
     const disciplinasArray = Object.values(disciplinasOfertadas)
@@ -1607,14 +1614,6 @@ function generateDisciplinasPrint(turnoSelecionado) { // Remova o valor padrão 
             <p>Gerado em: ${formatDateTime(new Date())}</p>
         </div>
         
-        <div class="print-controls">
-            <label for="print-turno">Filtrar por turno:</label>
-            <select id="print-turno" onchange="generateDisciplinasPrint()">
-                <option value="todos">Todos</option>
-                <option value="matutino">Matutino</option>
-                <option value="noturno">Noturno</option>
-            </select>
-        </div>
         
         <div class="disciplinas-container">
     `;
@@ -1720,9 +1719,15 @@ function initImpressao() {
         });
     }
 
-    if (printDisciplinasBtn && printTurnoSelect) {
-        printDisciplinasBtn.addEventListener('click', atualizarListaDisciplinas);
-        printTurnoSelect.addEventListener('change', atualizarListaDisciplinas);
+   if (printDisciplinasBtn && printTurnoSelect) {
+        // Evento único para ambos os casos
+        const handleDisciplinasClick = () => {
+            const turnoSelecionado = printTurnoSelect.value;
+            generateDisciplinasPrint(turnoSelecionado);
+        };
+
+        printDisciplinasBtn.addEventListener('click', handleDisciplinasClick);
+        printTurnoSelect.addEventListener('change', handleDisciplinasClick);
     }
 }
 
