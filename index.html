@@ -426,15 +426,6 @@
                 </div>
 
 
-               <div class="print-controls">
-                    <label for="print-turno">Filtrar por turno:</label>
-                    <select id="print-turno" onchange="atualizarListaDisciplinas()">
-                    <option value="todos">Todos</option>
-                    <option value="matutino">Matutino</option>
-                    <option value="noturno">Noturno</option>
-                    </select>
-                </div>
-
                 <div class="impressao-options">
                     <!-- Opção de Turma (existente) -->
                     <div class="option-card">
@@ -477,20 +468,30 @@
                     </div>
 
                     <!-- NOVA Opção de Lista de Disciplinas -->
-                    <div class="option-card">
-                        <div class="option-header">
-                            <i class="fas fa-list-ol"></i>
-                            <h3>Lista de Disciplinas</h3>
-                        </div>
-                        <div class="option-content">
-                            <p>Gere a lista completa de disciplinas organizadas por semestre</p>
-                            <button class="btn btn-primary" id="btn-print-disciplinas">
-                                <i class="fas fa-print"></i>
-                                Gerar Lista de Disciplinas
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                     <div class="option-card">
+        <div class="option-header">
+            <i class="fas fa-list-ol"></i>
+            <h3>Lista de Disciplinas</h3>
+        </div>
+        <div class="option-content">
+            <!-- FILTRO POR TURNO AQUI -->
+            <div class="print-controls">
+                <label for="print-turno">Filtrar por turno:</label>
+                <select id="print-turno" onchange="atualizarListaDisciplinas()">
+                    <option value="todos">Todos</option>
+                    <option value="matutino">Matutino</option>
+                    <option value="noturno">Noturno</option>
+                </select>
+            </div>
+
+            <p>Gere a lista completa de disciplinas organizadas por semestre</p>
+            <button class="btn btn-primary" id="btn-print-disciplinas">
+                <i class="fas fa-print"></i>
+                Gerar Lista de Disciplinas
+            </button>
+        </div>
+    </div>
+</div>
 
                 <div id="print-preview" class="print-preview">
                     <!-- Preview será exibido aqui -->
