@@ -1626,8 +1626,10 @@ function generateDisciplinasPrint(turnoSelecionado) {
     
     // Gerar conteúdo por semestre
     Object.keys(disciplinasPorSemestre)
-    .sort((a, b) => parseInt(a) - parseInt(b)) // <-- Correção chave aqui
-    .forEach((semestre, index) => {
+    .map(semestre => parseInt(semestre)) // Converte todos para números
+    .sort((a, b) => a - b) // Ordenação numérica direta
+    .forEach((semestreNum, index) => {
+        const semestre = semestreNum.toString(); // Volta para string se necessário
         const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
         
         html += `
