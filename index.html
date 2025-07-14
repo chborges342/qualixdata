@@ -444,7 +444,7 @@
                                     <option value="">Selecione uma turma</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" onclick="gerarPDF('horario_turma_' + document.getElementById('print-turma').value + '.pdf')">
+                            <button class="btn btn-primary" onclick="gerarHorarioTurmaPDF()">
                                 <i class="fas fa-file-pdf"></i>
                                 Gerar PDF
                             </button>
@@ -464,10 +464,10 @@
                                     <option value="">Selecione um professor</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" onclick="gerarPDF('horario_professor_' + document.getElementById('print-professor').value + '.pdf')">
+                            <button class="btn btn-primary" onclick="gerarHorarioProfessorPDF()">
                                 <i class="fas fa-file-pdf"></i>
-                                Gerar PDF
-                                </button>
+                                    Gerar PDF
+                            </button>
                         </div>
                     </div>
 
@@ -489,7 +489,7 @@
             </div>
 
             <p>Gere a lista completa de disciplinas organizadas por semestre</p>
-            <button class="btn btn-primary" onclick="gerarPDF('disciplinas_' + document.getElementById('print-turno').value + '.pdf')">
+            <button class="btn btn-primary" onclick="gerarListaDisciplinasPDF()">
                 <i class="fas fa-file-pdf"></i>
                 Gerar PDF
             </button>
