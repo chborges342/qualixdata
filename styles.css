@@ -1062,3 +1062,21 @@ body {
 .print-controls select option:hover {
     background-color: #e9ecef;
 }
+
+/* Garante que o preview tenha fundo branco no PDF */
+#print-preview {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+/* Melhora a legibilidade das tabelas */
+.print-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.print-table th, .print-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
