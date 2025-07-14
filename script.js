@@ -1549,11 +1549,15 @@ function atualizarListaDisciplinas() {
 }
 
 
-function generateDisciplinasPrint(turnoSelecionado) {
+async function generateDisciplinasPrint(turnoSelecionado) {
     const preview = document.getElementById('print-preview');
-    preview.innerHTML = ''; // Limpa o conteúdo anterior
-    
-    // 1. Filtra disciplinas que estão alocadas em horários
+    preview.innerHTML = '<div class="loading-pdf">Gerando PDF, aguarde...</div>';
+    preview.style.display = 'block';
+
+    // Adiciona um pequeno delay para garantir que o DOM seja atualizado
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Filtra as disciplinas que estão alocadas em horários
     const disciplinasOfertadas = {};
     
     toArray(appData.horarios).forEach(horario => {
@@ -1562,7 +1566,6 @@ function generateDisciplinasPrint(turnoSelecionado) {
         const professor = appData.professores[horario.idProfessor];
         
         if (disciplina && turma && professor) {
-            // Aplica o filtro de turno
             if (turnoSelecionado === 'todos' || turma.turno === turnoSelecionado) {
                 const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
                 
@@ -1584,11 +1587,11 @@ function generateDisciplinasPrint(turnoSelecionado) {
         }
     });
 
-    // 2. Converte para array e ordena por semestre
+    // Converter para array e ordenar por semestre
     const disciplinasArray = Object.values(disciplinasOfertadas)
         .sort((a, b) => a.semestre - b.semestre || a.nome.localeCompare(b.nome));
     
-    // 3. Agrupa por semestre
+    // Agrupar por semestre
     const disciplinasPorSemestre = {};
     disciplinasArray.forEach(disciplina => {
         if (!disciplinasPorSemestre[disciplina.semestre]) {
@@ -1597,7 +1600,7 @@ function generateDisciplinasPrint(turnoSelecionado) {
         disciplinasPorSemestre[disciplina.semestre].push(disciplina);
     });
 
-    // 4. Gera o HTML
+    // Gerar HTML
     let html = `
         <div class="print-header">
             <h2>Lista de Disciplinas Ofertadas - Ciências Econômicas UESC</h2>
@@ -1655,7 +1658,7 @@ function generateDisciplinasPrint(turnoSelecionado) {
 
     html += `
         </div>
-        <div class="print-footer">
+        <div class="print-footer no-print">
             <button class="btn btn-primary" onclick="printPage()">
                 <i class="fas fa-print"></i>
                 Imprimir
@@ -1668,8 +1671,14 @@ function generateDisciplinasPrint(turnoSelecionado) {
     `;
     
     preview.innerHTML = html;
-    preview.style.display = 'block';
-    preview.scrollIntoView({ behavior: 'smooth' });
+    
+    // Força um redesenho do DOM antes de gerar o PDF
+    await new Promise(resolve => {
+        setTimeout(() => {
+            preview.scrollIntoView({ behavior: 'auto' });
+            resolve();
+        }, 300);
+    });
 }
 
 // Atualize a função initImpressao para incluir o novo botão
@@ -1994,34 +2003,61 @@ function generateProfessorTurnoTable(turno, horariosData) {
     return html;
 }
 
-function gerarPDF(nomeArquivo = 'horarios_uesc.pdf') {
-    // Carrega a biblioteca jsPDF
-    const { jsPDF } = window.jspdf;
-    
-    // Captura a div que contém o conteúdo a ser impresso
-    const preview = document.getElementById('print-preview');
-    
-    // Configurações para melhor qualidade
-    html2canvas(preview, {
-        scale: 2, // Aumenta a resolução
-        logging: false, // Desativa logs no console
-        useCORS: true, // Permite carregar imagens externas
-        scrollY: 0 // Remove espaços em branco
-    }).then(canvas => {
-        // Configura o PDF (formato A4, retrato)
+async function gerarPDF(nomeArquivo = 'lista_disciplinas.pdf', elementoId = 'print-preview') {
+    try {
+        const { jsPDF } = window.jspdf;
+        const elemento = document.getElementById(elementoId);
+        
+        if (!elemento || elemento.innerHTML.includes('loading-pdf')) {
+            showAlert('Aguarde a conclusão da geração do conteúdo', 'warning');
+            return;
+        }
+
+        // Mostrar elemento temporariamente se estiver oculto
+        const estiloOriginal = elemento.style.display;
+        elemento.style.display = 'block';
+
+        // Adiciona um delay para garantir que o conteúdo esteja renderizado
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Configurações para melhor qualidade
+        const canvas = await html2canvas(elemento, {
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            scrollY: 0,
+            windowWidth: elemento.scrollWidth,
+            windowHeight: elemento.scrollHeight,
+            allowTaint: true
+        });
+
+        // Restaurar estilo original
+        elemento.style.display = estiloOriginal;
+
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 190; // Largura com margens
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
-        // Calcula dimensões para caber no PDF
-        const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // Margem de 10mm cada lado
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        // Adiciona primeira página
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
         
-        // Adiciona a imagem ao PDF
-        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
-        
-        // Salva o arquivo
+        // Adiciona páginas adicionais se necessário
+        let alturaRestante = imgHeight - (pdf.internal.pageSize.getHeight() - 20);
+        let posicao = -10;
+
+        while (alturaRestante > 0) {
+            pdf.addPage();
+            posicao += alturaRestante;
+            pdf.addImage(imgData, 'PNG', 10, posicao, imgWidth, imgHeight);
+            alturaRestante -= pdf.internal.pageSize.getHeight() - 20;
+        }
+
         pdf.save(nomeArquivo);
-    });
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        showAlert('Erro ao gerar PDF: ' + error.message, 'error');
+    }
 }
 
 function gerarHorarioTurmaPDF() {
