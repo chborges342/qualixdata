@@ -531,94 +531,106 @@ function renderDisciplinasList(searchTerm = '') {
     const container = document.getElementById('disciplinas-list');
     const disciplinasArray = toArray(appData.disciplinas);
     
-    // Filtra disciplinas
-    const filteredDisciplinas = disciplinasArray.filter(disciplina =>
-        disciplina.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        disciplina.codigo.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // 1. Filtragem segura
+    const filteredDisciplinas = disciplinasArray.filter(d => {
+        const matchesSearch = d.nome?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             d.codigo?.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesSearch && d.turnos && d.tipo;
+    });
 
     if (filteredDisciplinas.length === 0) {
         container.innerHTML = '<p class="no-activity">Nenhuma disciplina encontrada</p>';
         return;
     }
 
-    // Agrupa por turno e tipo
-    const disciplinasOrganizadas = {};
+    // 2. Inicialização garantida da estrutura
+    const turnosDisponiveis = ['matutino', 'noturno'];
+    const disciplinasPorTurnoETipo = {};
     
-    // Inicializa a estrutura
-    ['matutino', 'noturno'].forEach(turno => {
-        disciplinasOrganizadas[turno] = {
-            obrigatorias: [],
-            optativas: []
+    turnosDisponiveis.forEach(turno => {
+        disciplinasPorTurnoETipo[turno] = {
+            Obrigatoria: [],
+            Optativa: []
         };
     });
 
-    // Preenche os grupos
+    // 3. Agrupamento à prova de erros
     filteredDisciplinas.forEach(disciplina => {
+        if (!disciplina.turnos || !disciplina.tipo) return;
+        
         disciplina.turnos.forEach(turno => {
-            if (disciplina.tipo === 'Obrigatoria') {
-                disciplinasOrganizadas[turno].obrigatorias.push(disciplina);
-            } else {
-                disciplinasOrganizadas[turno].optativas.push(disciplina);
+            if (turnosDisponiveis.includes(turno)) {
+                const tipo = disciplina.tipo === 'Obrigatoria' ? 'Obrigatoria' : 'Optativa';
+                disciplinasPorTurnoETipo[turno][tipo].push(disciplina);
             }
         });
     });
 
-    // Gera o HTML
+    // 4. Renderização organizada
     let html = '';
     
-    // Renderiza por turno
-    Object.entries(disciplinasOrganizadas).forEach(([turno, grupos]) => {
-        const turnoFormatado = turno.charAt(0).toUpperCase() + turno.slice(1);
-        
-        html += `
-        <div class="turno-section">
-            <h3 class="turno-title">Turno ${turnoFormatado}</h3>
-            
-            <div class="disciplina-group obrigatorias">
-                <h4 class="group-title">Obrigatórias</h4>
-                ${renderDisciplinasGrupo(grupos.obrigatorias, turno)}
+    turnosDisponiveis.forEach(turno => {
+        const turnoCapitalized = turno.charAt(0).toUpperCase() + turno.slice(1);
+        const obrigatorias = disciplinasPorTurnoETipo[turno]['Obrigatoria'];
+        const optativas = disciplinasPorTurnoETipo[turno]['Optativa'];
+
+        // Ordena por semestre
+        obrigatorias.sort((a, b) => (a.semestresPorTurno?.[turno] || 0) - (b.semestresPorTurno?.[turno] || 0));
+        optativas.sort((a, b) => (a.semestresPorTurno?.[turno] || 0) - (b.semestresPorTurno?.[turno] || 0));
+
+        if (obrigatorias.length > 0 || optativas.length > 0) {
+            html += `
+            <div class="turno-container">
+                <h3 class="turno-header">Turno ${turnoCapitalized}</h3>
+                
+                ${obrigatorias.length > 0 ? `
+                <div class="disciplina-tipo-group">
+                    <h4 class="tipo-header obrigatoria">Obrigatórias</h4>
+                    <div class="disciplina-list">
+                        ${obrigatorias.map(d => renderDisciplinaCard(d, turno)).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${optativas.length > 0 ? `
+                <div class="disciplina-tipo-group">
+                    <h4 class="tipo-header optativa">Optativas</h4>
+                    <div class="disciplina-list">
+                        ${optativas.map(d => renderDisciplinaCard(d, turno)).join('')}
+                    </div>
+                </div>
+                ` : ''}
             </div>
-            
-            <div class="disciplina-group optativas">
-                <h4 class="group-title">Optativas</h4>
-                ${renderDisciplinasGrupo(grupos.optativas, turno)}
-            </div>
-        </div>
-        `;
+            `;
+        }
     });
 
-    container.innerHTML = html;
+    container.innerHTML = html || '<p class="no-activity">Nenhuma disciplina encontrada para os critérios</p>';
 }
 
-function renderDisciplinasGrupo(disciplinas, turno) {
-    // Ordena por semestre
-    disciplinas.sort((a, b) => {
-        const semA = a.semestresPorTurno[turno] || 0;
-        const semB = b.semestresPorTurno[turno] || 0;
-        return semA - semB;
-    });
-
-    return disciplinas.map(disciplina => `
-        <div class="disciplina-card ${disciplina.tipo.toLowerCase()}">
-            <div class="disciplina-info">
-                <span class="codigo">${disciplina.codigo}</span>
-                <h5>${disciplina.nome}</h5>
-                <div class="detalhes">
-                    <span>${disciplina.semestresPorTurno[turno]}º Semestre</span>
-                    <span>${disciplina.cargaHoraria}h</span>
-                </div>
-            </div>
-            <div class="acoes">
-                <button class="btn-editar" onclick="editDisciplina('${disciplina.id}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-excluir" onclick="deleteDisciplina('${disciplina.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
+function renderDisciplinaCard(disciplina, turno) {
+    const semestre = disciplina.semestresPorTurno?.[turno] || 'N/A';
+    
+    return `
+    <div class="disciplina-card ${disciplina.tipo.toLowerCase()}">
+        <div class="disciplina-main-info">
+            <span class="disciplina-codigo">${disciplina.codigo || 'Sem código'}</span>
+            <h5 class="disciplina-nome">${disciplina.nome}</h5>
+            <div class="disciplina-meta">
+                <span class="semestre">${semestre}º Semestre</span>
+                <span class="carga-horaria">${disciplina.cargaHoraria || 0}h</span>
             </div>
         </div>
-    `).join('');
+        <div class="disciplina-actions">
+            <button class="btn-edit" onclick="editDisciplina('${disciplina.id}')">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn-delete" onclick="deleteDisciplina('${disciplina.id}')">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+        </div>
+    </div>
+    `;
 }
 
 async function editDisciplina(id) {
