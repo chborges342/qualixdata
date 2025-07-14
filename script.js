@@ -529,45 +529,118 @@ function initDisciplinas() {
 
 function renderDisciplinasList(searchTerm = '') {
     const container = document.getElementById('disciplinas-list');
-    const disciplinasArray = toArray(appData.disciplinas); // Converte para array
-    const filteredDisciplinas = disciplinasArray.filter(disciplina =>
-        disciplina.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        disciplina.codigo.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const disciplinasArray = toArray(appData.disciplinas);
+    
+    // Filtra e classifica as disciplinas
+    const filteredDisciplinas = disciplinasArray
+        .filter(disciplina =>
+            disciplina.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            disciplina.codigo.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            // Ordena por: tipo (obrigatórias primeiro) > turno > semestre > nome
+            if (a.tipo !== b.tipo) {
+                return a.tipo === 'Obrigatoria' ? -1 : 1;
+            }
+            
+            // Para disciplinas do mesmo tipo, ordena por semestre
+            const turnoComum = a.turnos.find(t => b.turnos.includes(t));
+            if (turnoComum) {
+                const semestreA = a.semestresPorTurno[turnoComum] || 0;
+                const semestreB = b.semestresPorTurno[turnoComum] || 0;
+                return semestreA - semestreB;
+            }
+            
+            return a.nome.localeCompare(b.nome);
+        });
 
     if (filteredDisciplinas.length === 0) {
         container.innerHTML = '<p class="no-activity">Nenhuma disciplina encontrada</p>';
         return;
     }
 
-    container.innerHTML = filteredDisciplinas.map(disciplina => {
-        // NOVO: Formata os turnos e semestres para exibição
-        const turnosDisplay = disciplina.turnos && disciplina.semestresPorTurno
-            ? disciplina.turnos.map(turno => {
-                const semestre = disciplina.semestresPorTurno[turno];
-                return `${turno.charAt(0).toUpperCase() + turno.slice(1)} (${semestre}º Semestre)`;
-            }).join(', ')
-            : 'Nenhum';
+    // Agrupa por turno
+    const disciplinasPorTurno = {};
+    filteredDisciplinas.forEach(disciplina => {
+        disciplina.turnos.forEach(turno => {
+            if (!disciplinasPorTurno[turno]) {
+                disciplinasPorTurno[turno] = {
+                    obrigatorias: [],
+                    optativas: []
+                };
+            }
+            
+            if (disciplina.tipo === 'Obrigatoria') {
+                disciplinasPorTurno[turno].obrigatorias.push(disciplina);
+            } else {
+                disciplinasPorTurno[turno].optativas.push(disciplina);
+            }
+        });
+    });
 
-        return `
-            <div class="item-card">
-                <div class="item-info">
-                    <h4>${disciplina.nome} <small>(${disciplina.tipo === 'Obrigatoria' ? 'Obrigatória' : 'Optativa'})</small></h4>
-                    <p>Código: ${disciplina.codigo}</p>
-                    <p>Carga Horária: ${disciplina.cargaHoraria}h/aula</p>
-                    <p>Turnos: ${turnosDisplay}</p>
-                </div>
-                <div class="item-actions">
-                    <button class="btn btn-secondary btn-small" onclick="editDisciplina('${disciplina.id}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger btn-small" onclick="deleteDisciplina('${disciplina.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+    // Gera o HTML organizado
+    let html = '';
+    
+    Object.entries(disciplinasPorTurno).forEach(([turno, disciplinas]) => {
+        const turnoFormatado = turno.charAt(0).toUpperCase() + turno.slice(1);
+        
+        html += `<div class="turno-group">
+                    <h4 class="turno-header">Turno ${turnoFormatado}</h4>
+                    <div class="disciplinas-container">`;
+        
+        // Disciplinas obrigatórias
+        html += `<div class="tipo-group">
+                    <h5 class="tipo-header">Obrigatórias</h5>`;
+        
+        disciplinas.obrigatorias
+            .sort((a, b) => (a.semestresPorTurno[turno] || 0) - (b.semestresPorTurno[turno] || 0))
+            .forEach(disciplina => {
+                html += createDisciplinaCard(disciplina, turno);
+            });
+        
+        html += `</div>`;
+        
+        // Disciplinas optativas
+        html += `<div class="tipo-group">
+                    <h5 class="tipo-header">Optativas</h5>`;
+        
+        disciplinas.optativas
+            .sort((a, b) => (a.semestresPorTurno[turno] || 0) - (b.semestresPorTurno[turno] || 0))
+            .forEach(disciplina => {
+                html += createDisciplinaCard(disciplina, turno);
+            });
+        
+        html += `</div></div></div>`;
+    });
+
+    container.innerHTML = html;
+}
+
+// Função auxiliar para criar o card de disciplina
+function createDisciplinaCard(disciplina, turno) {
+    const semestre = disciplina.semestresPorTurno[turno] || 'N/A';
+    
+    return `
+        <div class="item-card ${disciplina.tipo === 'Obrigatoria' ? 'obrigatoria' : 'optativa'}">
+            <div class="item-info">
+                <h4>${disciplina.nome} 
+                    <span class="badge-tipo ${disciplina.tipo === 'Obrigatoria' ? 'badge-obrigatoria' : 'badge-optativa'}">
+                        ${disciplina.tipo === 'Obrigatoria' ? 'Obrigatória' : 'Optativa'}
+                    </span>
+                </h4>
+                <p>Código: ${disciplina.codigo} | Semestre: ${semestre}º</p>
+                <p>Carga Horária: ${disciplina.cargaHoraria}h/aula</p>
             </div>
-        `;
-    }).join('');
+            <div class="item-actions">
+                <button class="btn btn-secondary btn-small" onclick="editDisciplina('${disciplina.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-small" onclick="deleteDisciplina('${disciplina.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 async function editDisciplina(id) {
