@@ -1553,40 +1553,56 @@ function generateDisciplinasPrint(turnoSelecionado) {
     const preview = document.getElementById('print-preview');
     preview.innerHTML = ''; // Limpa o conteúdo anterior
     
-    // 1. Filtra disciplinas pelo turno selecionado
-    const disciplinasFiltradas = toArray(appData.disciplinas).filter(disciplina => {
-        return turnoSelecionado === 'todos' || 
-               (disciplina.turnos && disciplina.turnos.includes(turnoSelecionado));
-    });
-
-    // 2. Agrupa por semestre
-    const disciplinasPorSemestre = {};
+    // 1. Filtra disciplinas que estão alocadas em horários
+    const disciplinasOfertadas = {};
     
-    disciplinasFiltradas.forEach(disciplina => {
-        // Para cada turno da disciplina (se 'todos' foi selecionado)
-        const turnosParaIncluir = turnoSelecionado === 'todos' ? disciplina.turnos : [turnoSelecionado];
+    toArray(appData.horarios).forEach(horario => {
+        const disciplina = appData.disciplinas[horario.idDisciplina];
+        const turma = appData.turmas[horario.idTurma];
+        const professor = appData.professores[horario.idProfessor];
         
-        turnosParaIncluir.forEach(turno => {
-            const semestre = disciplina.semestresPorTurno?.[turno] || 0;
-            
-            if (!disciplinasPorSemestre[semestre]) {
-                disciplinasPorSemestre[semestre] = [];
+        if (disciplina && turma && professor) {
+            // Aplica o filtro de turno
+            if (turnoSelecionado === 'todos' || turma.turno === turnoSelecionado) {
+                const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
+                
+                if (!disciplinasOfertadas[disciplina.id]) {
+                    disciplinasOfertadas[disciplina.id] = {
+                        ...disciplina,
+                        semestre,
+                        turno: turma.turno,
+                        turmas: [],
+                        professores: new Set()
+                    };
+                }
+                
+                if (!disciplinasOfertadas[disciplina.id].turmas.includes(turma.nome)) {
+                    disciplinasOfertadas[disciplina.id].turmas.push(turma.nome);
+                }
+                disciplinasOfertadas[disciplina.id].professores.add(professor.nome);
             }
-            
-            // Adiciona informações específicas do turno
-            disciplinasPorSemestre[semestre].push({
-                ...disciplina,
-                turnoExibicao: turno,
-                semestreExibicao: semestre
-            });
-        });
+        }
     });
 
-    // 3. Gera o HTML
+    // 2. Converte para array e ordena por semestre
+    const disciplinasArray = Object.values(disciplinasOfertadas)
+        .sort((a, b) => a.semestre - b.semestre || a.nome.localeCompare(b.nome));
+    
+    // 3. Agrupa por semestre
+    const disciplinasPorSemestre = {};
+    disciplinasArray.forEach(disciplina => {
+        if (!disciplinasPorSemestre[disciplina.semestre]) {
+            disciplinasPorSemestre[disciplina.semestre] = [];
+        }
+        disciplinasPorSemestre[disciplina.semestre].push(disciplina);
+    });
+
+    // 4. Gera o HTML
     let html = `
         <div class="print-header">
             <h2>Lista de Disciplinas Ofertadas - Ciências Econômicas UESC</h2>
             <p>Turno: ${turnoSelecionado === 'todos' ? 'Todos' : turnoSelecionado.charAt(0).toUpperCase() + turnoSelecionado.slice(1)}</p>
+            <p>Semestre: ${new Date().getFullYear()}.${new Date().getMonth() < 6 ? 1 : 2}</p>
             <p>Gerado em: ${formatDateTime(new Date())}</p>
         </div>
         <div class="disciplinas-container">
@@ -1608,6 +1624,8 @@ function generateDisciplinasPrint(turnoSelecionado) {
                         <tr>
                             <th>Código</th>
                             <th>Disciplina</th>
+                            <th>Turmas</th>
+                            <th>Professor(es)</th>
                             <th>C.H.</th>
                             <th>Turno</th>
                         </tr>
@@ -1615,19 +1633,18 @@ function generateDisciplinasPrint(turnoSelecionado) {
                     <tbody>
         `;
         
-        // Ordena disciplinas por nome
-        disciplinasPorSemestre[semestre]
-            .sort((a, b) => a.nome.localeCompare(b.nome))
-            .forEach(disciplina => {
-                html += `
-                    <tr>
-                        <td>${disciplina.codigo}</td>
-                        <td>${disciplina.nome}</td>
-                        <td>${disciplina.cargaHoraria}h</td>
-                        <td>${disciplina.turnoExibicao.charAt(0).toUpperCase() + disciplina.turnoExibicao.slice(1)}</td>
-                    </tr>
-                `;
-            });
+        disciplinasPorSemestre[semestre].forEach(disciplina => {
+            html += `
+                <tr>
+                    <td>${disciplina.codigo}</td>
+                    <td>${disciplina.nome}</td>
+                    <td>${disciplina.turmas.join(', ')}</td>
+                    <td>${Array.from(disciplina.professores).join(', ')}</td>
+                    <td>${disciplina.cargaHoraria}h</td>
+                    <td>${disciplina.turno.charAt(0).toUpperCase() + disciplina.turno.slice(1)}</td>
+                </tr>
+            `;
+        });
         
         html += `
                     </tbody>
@@ -1636,10 +1653,24 @@ function generateDisciplinasPrint(turnoSelecionado) {
         `;
     });
 
-    html += `</div>`;
+    html += `
+        </div>
+        <div class="print-footer">
+            <button class="btn btn-primary" onclick="printPage()">
+                <i class="fas fa-print"></i>
+                Imprimir
+            </button>
+            <button class="btn btn-secondary" onclick="closePrintPreview()">
+                <i class="fas fa-times"></i>
+                Fechar
+            </button>
+        </div>
+    `;
+    
     preview.innerHTML = html;
+    preview.style.display = 'block';
+    preview.scrollIntoView({ behavior: 'smooth' });
 }
-
 
 // Atualize a função initImpressao para incluir o novo botão
 function initImpressao() {
