@@ -1551,140 +1551,93 @@ function atualizarListaDisciplinas() {
 
 function generateDisciplinasPrint(turnoSelecionado) {
     const preview = document.getElementById('print-preview');
-    preview.classList.remove('hidden');
-
-    // Debug: verifique o valor recebido
-    console.log("[DEBUG] Turno recebido para filtro:", turnoSelecionado);
-    console.log("[DEBUG] Turmas disponíveis:", toArray(appData.turmas).map(t => ({id: t.id, nome: t.nome, turno: t.turno})));
-
-    // Filtra as disciplinas que estão alocadas em horários
-    const disciplinasOfertadas = {};
+    preview.innerHTML = ''; // Limpa o conteúdo anterior
     
-    toArray(appData.horarios).forEach(horario => {
-        const disciplina = appData.disciplinas[horario.idDisciplina];
-        const turma = appData.turmas[horario.idTurma];
-        const professor = appData.professores[horario.idProfessor];
-        
-        if (disciplina && turma && professor) {
-            // Aplica o filtro de turno corretamente (com comparação case-insensitive)
-            const turnoTurma = turma.turno?.toLowerCase(); // Converta para lowercase
-            const turnoFiltro = turnoSelecionado?.toLowerCase();
-            
-            if (turnoFiltro === 'todos' || turnoTurma === turnoFiltro) {
-                const semestre = disciplina.semestresPorTurno?.[turma.turno] || 0;
-                
-                if (!disciplinasOfertadas[disciplina.id]) {
-                    disciplinasOfertadas[disciplina.id] = {
-                        ...disciplina,
-                        semestre,
-                        turno: turma.turno, // Mantém o original para exibição
-                        turmas: [],
-                        professores: new Set()
-                    };
-                }
-                
-                if (!disciplinasOfertadas[disciplina.id].turmas.includes(turma.nome)) {
-                    disciplinasOfertadas[disciplina.id].turmas.push(turma.nome);
-                }
-                disciplinasOfertadas[disciplina.id].professores.add(professor.nome);
-            }
-        }
+    // 1. Filtra disciplinas pelo turno selecionado
+    const disciplinasFiltradas = toArray(appData.disciplinas).filter(disciplina => {
+        return turnoSelecionado === 'todos' || 
+               (disciplina.turnos && disciplina.turnos.includes(turnoSelecionado));
     });
 
-    
-    // Converter para array e ordenar por semestre
-    const disciplinasArray = Object.values(disciplinasOfertadas)
-        .sort((a, b) => a.semestre - b.semestre || a.nome.localeCompare(b.nome));
-    
-    // Agrupar por semestre
+    // 2. Agrupa por semestre
     const disciplinasPorSemestre = {};
-    disciplinasArray.forEach(disciplina => {
-        if (!disciplinasPorSemestre[disciplina.semestre]) {
-            disciplinasPorSemestre[disciplina.semestre] = [];
-        }
-        disciplinasPorSemestre[disciplina.semestre].push(disciplina);
-    });
     
-    // Gerar HTML
+    disciplinasFiltradas.forEach(disciplina => {
+        // Para cada turno da disciplina (se 'todos' foi selecionado)
+        const turnosParaIncluir = turnoSelecionado === 'todos' ? disciplina.turnos : [turnoSelecionado];
+        
+        turnosParaIncluir.forEach(turno => {
+            const semestre = disciplina.semestresPorTurno?.[turno] || 0;
+            
+            if (!disciplinasPorSemestre[semestre]) {
+                disciplinasPorSemestre[semestre] = [];
+            }
+            
+            // Adiciona informações específicas do turno
+            disciplinasPorSemestre[semestre].push({
+                ...disciplina,
+                turnoExibicao: turno,
+                semestreExibicao: semestre
+            });
+        });
+    });
+
+    // 3. Gera o HTML
     let html = `
         <div class="print-header">
             <h2>Lista de Disciplinas Ofertadas - Ciências Econômicas UESC</h2>
             <p>Turno: ${turnoSelecionado === 'todos' ? 'Todos' : turnoSelecionado.charAt(0).toUpperCase() + turnoSelecionado.slice(1)}</p>
-            <p>Semestre: ${new Date().getFullYear()}.${new Date().getMonth() < 6 ? 1 : 2}</p>
             <p>Gerado em: ${formatDateTime(new Date())}</p>
         </div>
-        
-        
         <div class="disciplinas-container">
     `;
-    
-    // Preencher select com o turno atual
-    const turnoSelect = document.getElementById('print-turno');
-    if (turnoSelect) {
-        turnoSelect.value = turnoSelecionado;
-    }
-    
-    // Gerar conteúdo por semestre
-    Object.keys(disciplinasPorSemestre)
-    .map(semestre => parseInt(semestre)) // Converte todos para números
-    .sort((a, b) => a - b) // Ordenação numérica direta
-    .forEach((semestreNum, index) => {
-        const semestre = semestreNum.toString(); // Volta para string se necessário
+
+    // Ordena os semestres numericamente
+    const semestresOrdenados = Object.keys(disciplinasPorSemestre)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    semestresOrdenados.forEach((semestre, index) => {
         const bgColor = index % 2 === 0 ? '#f5f5f5' : '#ffffff';
         
         html += `
             <div class="semestre-group" style="background-color: ${bgColor};">
                 <h3 class="semestre-title">${semestre}º Semestre</h3>
-                    <table class="print-table disciplinas-table">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Disciplina</th>
-                                <th>Turmas</th>
-                                <th>Professor(es)</th>
-                                <th>C.H.</th>
-                                <th>Turno</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            disciplinasPorSemestre[semestre].forEach(disciplina => {
+                <table class="print-table disciplinas-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Disciplina</th>
+                            <th>C.H.</th>
+                            <th>Turno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Ordena disciplinas por nome
+        disciplinasPorSemestre[semestre]
+            .sort((a, b) => a.nome.localeCompare(b.nome))
+            .forEach(disciplina => {
                 html += `
                     <tr>
                         <td>${disciplina.codigo}</td>
                         <td>${disciplina.nome}</td>
-                        <td>${disciplina.turmas.join(', ')}</td>
-                        <td>${Array.from(disciplina.professores).join(', ')}</td>
                         <td>${disciplina.cargaHoraria}h</td>
-                        <td>${disciplina.turno.charAt(0).toUpperCase() + disciplina.turno.slice(1)}</td>
+                        <td>${disciplina.turnoExibicao.charAt(0).toUpperCase() + disciplina.turnoExibicao.slice(1)}</td>
                     </tr>
                 `;
             });
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        });
-    
-    html += `
-        </div>
-        <div class="print-footer">
-            <button class="btn btn-primary" onclick="printPage()">
-                <i class="fas fa-print"></i>
-                Imprimir
-            </button>
-            <button class="btn btn-secondary" onclick="closePrintPreview()">
-                <i class="fas fa-times"></i>
-                Fechar
-            </button>
-        </div>
-    `;
-    
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
     preview.innerHTML = html;
-    preview.scrollIntoView({ behavior: 'smooth' });
 }
 
 
@@ -2037,6 +1990,70 @@ function gerarPDF(nomeArquivo = 'horarios_uesc.pdf') {
         
         // Salva o arquivo
         pdf.save(nomeArquivo);
+    });
+}
+
+function gerarHorarioTurmaPDF() {
+    const turmaId = document.getElementById('print-turma').value;
+    if (!turmaId) {
+        showAlert('Selecione uma turma primeiro', 'warning');
+        return;
+    }
+    generateTurmaPrint(turmaId);
+    setTimeout(() => gerarPDF('horario_turma.pdf', 'print-preview'), 500);
+}
+
+function gerarHorarioProfessorPDF() {
+    const professorId = document.getElementById('print-professor').value;
+    if (!professorId) {
+        showAlert('Selecione um professor primeiro', 'warning');
+        return;
+    }
+    generateProfessorPrint(professorId);
+    setTimeout(() => gerarPDF('horario_professor.pdf', 'print-preview'), 500);
+}
+
+function gerarListaDisciplinasPDF() {
+    const turno = document.getElementById('print-turno').value;
+    generateDisciplinasPrint(turno);
+    setTimeout(() => gerarPDF('lista_disciplinas.pdf', 'print-preview'), 500);
+}
+
+function gerarPDF(nomeArquivo = 'horarios_uesc.pdf', elementoId = 'print-preview') {
+    const { jsPDF } = window.jspdf;
+    const elemento = document.getElementById(elementoId);
+    
+    if (!elemento || elemento.innerHTML.trim() === '') {
+        showAlert('Nenhum conteúdo encontrado para gerar PDF', 'error');
+        return;
+    }
+
+    // Mostrar elemento temporariamente se estiver oculto
+    const estiloOriginal = elemento.style.display;
+    elemento.style.display = 'block';
+
+    html2canvas(elemento, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        windowWidth: elemento.scrollWidth,
+        windowHeight: elemento.scrollHeight
+    }).then(canvas => {
+        // Restaurar estilo original
+        elemento.style.display = estiloOriginal;
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 190; // Largura com margens
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        pdf.save(nomeArquivo);
+    }).catch(error => {
+        console.error('Erro ao gerar PDF:', error);
+        showAlert('Erro ao gerar PDF: ' + error.message, 'error');
+        elemento.style.display = estiloOriginal;
     });
 }
 
