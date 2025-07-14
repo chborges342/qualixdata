@@ -1,4 +1,4 @@
-/* Reset e configurações básicas */
+/* ========== RESET E CONFIGURAÇÕES BÁSICAS ========== */
 * {
     margin: 0;
     padding: 0;
@@ -10,6 +10,7 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
+    line-height: 1.6;
 }
 
 .app-container {
@@ -18,7 +19,7 @@ body {
     flex-direction: column;
 }
 
-/* Header */
+/* ========== HEADER ========== */
 .header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -94,7 +95,7 @@ body {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-/* Main Content */
+/* ========== MAIN CONTENT ========== */
 .main-content {
     flex: 1;
     max-width: 1200px;
@@ -141,7 +142,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Dashboard */
+/* ========== DASHBOARD ========== */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -222,7 +223,7 @@ body {
     font-style: italic;
 }
 
-/* Cadastros */
+/* ========== CADASTROS ========== */
 .cadastros-tabs {
     display: flex;
     gap: 0.5rem;
@@ -279,7 +280,7 @@ body {
     font-size: 1.3rem;
 }
 
-/* Forms */
+/* ========== FORMS ========== */
 .form {
     display: flex;
     flex-direction: column;
@@ -348,7 +349,7 @@ body {
     margin-top: 1rem;
 }
 
-/* Buttons */
+/* ========== BUTTONS ========== */
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -395,7 +396,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Search */
+/* ========== SEARCH ========== */
 .search-box {
     position: relative;
     margin-bottom: 1rem;
@@ -417,7 +418,7 @@ body {
     font-size: 1rem;
 }
 
-/* Lists */
+/* ========== LISTS ========== */
 .items-list {
     max-height: 400px;
     overflow-y: auto;
@@ -461,7 +462,7 @@ body {
     min-width: auto;
 }
 
-/* ========== GRADE DE HORÁRIOS ATUALIZADA ========== */
+/* ========== HORÁRIOS ========== */
 .horarios-controls {
     background: white;
     padding: 1.5rem;
@@ -590,7 +591,7 @@ body {
     cursor: not-allowed;
 }
 
-/* Modal */
+/* ========== MODAL ========== */
 .modal {
     display: none;
     position: fixed;
@@ -650,7 +651,7 @@ body {
     color: #333;
 }
 
-/* Impressão */
+/* ========== IMPRESSÃO ========== */
 .impressao-options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -691,19 +692,120 @@ body {
     padding: 1.5rem;
 }
 
+.print-controls {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.print-controls label {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.print-controls select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.print-controls select:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
 .print-preview {
     background: white;
     padding: 2rem;
     border-radius: 15px;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
     margin-top: 2rem;
-}
-
-.print-preview.hidden {
     display: none;
 }
 
-/* Alerts */
+.print-preview.active {
+    display: block;
+}
+
+/* ========== LISTA DE DISCIPLINAS ========== */
+.disciplinas-container {
+    margin-top: 20px;
+}
+
+.semestre-group {
+    margin-bottom: 30px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.semestre-title {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3498db;
+}
+
+.disciplinas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.9em;
+}
+
+.disciplinas-table th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px 15px;
+}
+
+.disciplinas-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.disciplinas-table tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.disciplinas-table tr:hover {
+    background-color: #e9e9e9;
+}
+
+.print-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #333;
+    padding-bottom: 1rem;
+}
+
+.print-header h2 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.print-header p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.print-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* ========== ALERTS ========== */
 .alerts-container {
     position: fixed;
     top: 20px;
@@ -781,77 +883,7 @@ body {
     }
 }
 
-/* Print-specific styles */
-.print-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid #333;
-    padding-bottom: 1rem;
-}
-
-.print-header h2 {
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.print-header p {
-    margin: 0.25rem 0;
-    color: #666;
-}
-
-.print-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-    font-size: 0.9rem;
-}
-
-.print-table th,
-.print-table td {
-    border: 1px solid #333;
-    padding: 0.5rem;
-    text-align: center;
-    vertical-align: top;
-}
-
-.print-table th {
-    background: #f0f0f0;
-    font-weight: bold;
-}
-
-.print-horario-info {
-    text-align: left;
-    line-height: 1.3;
-}
-
-.print-horario-info .disciplina {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-    color: #333;
-}
-
-.print-horario-info .professor,
-.print-horario-info .turma,
-.print-horario-info .sala {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 0.1rem;
-}
-
-.print-footer {
-    margin-top: 2rem;
-    text-align: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* Melhoria de contraste para cores claras */
-.horario-slot.ocupado .horario-info {
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
-}
-
-/* Responsive */
+/* ========== RESPONSIVIDADE ========== */
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
@@ -895,6 +927,20 @@ body {
     .form-actions {
         flex-direction: column;
     }
+
+    .print-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .print-table, .disciplinas-table {
+        font-size: 0.8rem;
+    }
+    
+    .disciplinas-table th, 
+    .disciplinas-table td {
+        padding: 8px 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -921,31 +967,60 @@ body {
     }
 }
 
-/* Print styles */
+/* ========== ESTILOS DE IMPRESSÃO ========== */
 @media print {
-    body {
+    body * {
+        visibility: hidden;
+    }
+    
+    #print-preview, #print-preview * {
+        visibility: visible;
+    }
+    
+    #print-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+        box-shadow: none;
         background: white;
     }
-
-    .header,
-    .nav-menu,
-    .section-header,
-    .horarios-controls,
-    .impressao-options,
-    .alerts-container {
-        display: none !important;
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #333;
     }
-
-    .main-content {
-        max-width: none;
-        padding: 0;
+    
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
     }
-
-    .print-preview {
-        box-shadow: none;
-        padding: 0;
+    
+    .print-table th, .print-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
     }
-
+    
+    .print-table th {
+        background-color: #f2f2f2;
+    }
+    
+    .semestre-group {
+        page-break-inside: avoid;
+        margin-bottom: 30px;
+    }
+    
+    .print-footer {
+        display: none;
+    }
+    
     .grade-horarios {
         font-size: 12px;
     }
@@ -959,124 +1034,4 @@ body {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-}
-
-/* NOVOS ESTILOS PARA A LISTA DE DISCIPLINAS */
-.print-table.disciplinas-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 0.9em;
-}
-
-.print-table.disciplinas-table th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px 15px;
-}
-
-.print-table.disciplinas-table td {
-    padding: 10px 15px;
-    border-bottom: 1px solid #dddddd;
-}
-
-.print-table.disciplinas-table tr:nth-child(even) {
-    background-color: #f3f3f3;
-}
-
-.print-table.disciplinas-table tr:hover {
-    background-color: #e9e9e9;
-}
-
-.print-table.disciplinas-table tr.semestre-header {
-    background-color: #3498db;
-    color: white;
-    font-weight: bold;
-}
-
-/* Ajustes para impressão */
-@media print {
-    .print-table.disciplinas-table {
-        font-size: 12pt;
-        width: 100%;
-    }
-    
-    .print-table.disciplinas-table th,
-    .print-table.disciplinas-table td {
-        padding: 8px 10px;
-    }
-    
-    .no-print {
-        display: none !important;
-    }
-}
-
-/* Estilos para a lista de disciplinas ofertadas */
-.disciplinas-container {
-    margin-top: 20px;
-}
-
-.semestre-group {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.semestre-title {
-    color: #2c3e50;
-    margin-top: 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
-}
-
-.print-controls {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.print-controls label {
-    font-weight: 600;
-    color: #343a40;
-}
-
-.print-controls select {
-    padding: 8px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-}
-
-.print-controls select:focus {
-    border-color: #80bdff;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-.print-controls select option:hover {
-    background-color: #e9ecef;
-}
-
-/* Garante que o preview tenha fundo branco no PDF */
-#print-preview {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-}
-
-/* Melhora a legibilidade das tabelas */
-.print-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.print-table th, .print-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
 }
