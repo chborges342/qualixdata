@@ -2010,34 +2010,13 @@ function generateProfessorTurnoTable(turno, horariosData) {
     return html;
 }
 
-function gerarPDF(nomeArquivo = 'horarios_uesc.pdf') {
-    // Carrega a biblioteca jsPDF
-    const { jsPDF } = window.jspdf;
-    
-    // Captura a div que contém o conteúdo a ser impresso
-    const preview = document.getElementById('print-preview');
-    
-    // Configurações para melhor qualidade
-    html2canvas(preview, {
-        scale: 2, // Aumenta a resolução
-        logging: false, // Desativa logs no console
-        useCORS: true, // Permite carregar imagens externas
-        scrollY: 0 // Remove espaços em branco
-    }).then(canvas => {
-        // Configura o PDF (formato A4, retrato)
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgData = canvas.toDataURL('image/png');
-        
-        // Calcula dimensões para caber no PDF
-        const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // Margem de 10mm cada lado
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        // Adiciona a imagem ao PDF
-        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
-        
-        // Salva o arquivo
-        pdf.save(nomeArquivo);
-    });
+function gerarPDFTextual() {
+    const conteudo = document.getElementById('print-preview').innerText;
+    const docDefinition = {
+        content: [{ text: conteudo, style: 'detalhes' }],
+        styles: { detalhes: { fontSize: 10 } }
+    };
+    pdfMake.createPdf(docDefinition).download('horario.pdf');
 }
 
 
