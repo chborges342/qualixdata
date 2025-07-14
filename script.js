@@ -500,11 +500,19 @@ function initDisciplinas() {
             } else {
                 // MODO DE CRIAÇÃO
                 const disciplinaListRef = window.dbRef(window.firebaseDB, 'disciplinas');
-                disciplinaData.createdAt = window.dbServerTimestamp;
-                await window.dbPush(disciplinaListRef, disciplinaData);
+                const newDisciplina = {
+        nome: disciplinaData.nome,
+        codigo: disciplinaData.codigo,
+        cargaHoraria: disciplinaData.cargaHoraria,
+        tipo: disciplinaData.tipo,
+        turnos: disciplinaData.turnos,
+        semestresPorTurno: disciplinaData.semestresPorTurno,
+        createdAt: { '.sv': 'timestamp' } // Formato especial
+    };
 
-                showAlert('Disciplina cadastrada com sucesso!', 'success');
-            }
+    await window.dbPush(disciplinaListRef, newDisciplina);
+    showAlert('Disciplina cadastrada com sucesso!', 'success');
+}
             cancelEditing(); // Reseta o formulário e o estado de edição
         } catch (error) {
             console.error('Erro ao salvar disciplina:', error);
