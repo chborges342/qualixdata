@@ -431,6 +431,11 @@ function initDisciplinas() {
         const nome = document.getElementById('disciplina-nome').value.trim();
         const codigo = document.getElementById('disciplina-codigo').value.trim();
         const cargaHoraria = parseInt(document.getElementById('disciplina-carga').value);
+        const tipo = document.getElementById('disciplina-tipo').value;
+    if (!tipo) {
+        showAlert('Selecione o tipo da disciplina (Obrigatória/Optativa).', 'error');
+        return;
+    }
         
         const selectedTurnos = Array.from(turnoSelect.selectedOptions).map(option => option.value);
 
@@ -466,12 +471,14 @@ function initDisciplinas() {
         }
 
         const disciplinaData = {
-            nome,
-            codigo,
-            cargaHoraria,
-            turnos: selectedTurnos, // Array de turnos
-            semestresPorTurno: semestresPorTurno // Objeto com semestres por turno
-        };
+        nome,
+        codigo,
+        cargaHoraria,
+        tipo, // NOVO CAMPO ADICIONADO
+        turnos: selectedTurnos,
+        semestresPorTurno: semestresPorTurno
+    };
+
 
         try {
             if (currentEditingItemId) {
@@ -528,7 +535,7 @@ function renderDisciplinasList(searchTerm = '') {
         return `
             <div class="item-card">
                 <div class="item-info">
-                    <h4>${disciplina.nome}</h4>
+                    <h4>${disciplina.nome} <small>(${disciplina.tipo === 'Obrigatoria' ? 'Obrigatória' : 'Optativa'})</small></h4>
                     <p>Código: ${disciplina.codigo}</p>
                     <p>Carga Horária: ${disciplina.cargaHoraria}h/aula</p>
                     <p>Turnos: ${turnosDisplay}</p>
@@ -559,6 +566,7 @@ async function editDisciplina(id) {
     document.getElementById('disciplina-nome').value = disciplina.nome;
     document.getElementById('disciplina-codigo').value = disciplina.codigo;
     document.getElementById('disciplina-carga').value = disciplina.cargaHoraria;
+    document.getElementById('disciplina-tipo').value = disciplina.tipo || 'Obrigatoria';
 
     const turnoSelect = document.getElementById('disciplina-turno');
     Array.from(turnoSelect.options).forEach(option => {
