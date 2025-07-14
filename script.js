@@ -2080,10 +2080,16 @@ function gerarHorarioProfessorPDF() {
     setTimeout(() => gerarPDF('horario_professor.pdf', 'print-preview'), 500);
 }
 
-function gerarListaDisciplinasPDF() {
+async function gerarListaDisciplinasPDF() {
     const turno = document.getElementById('print-turno').value;
-    generateDisciplinasPrint(turno);
-    setTimeout(() => gerarPDF('lista_disciplinas.pdf', 'print-preview'), 500);
+    
+    // Primeiro gera o conteúdo
+    await generateDisciplinasPrint(turno);
+    
+    // Depois gera o PDF com um pequeno delay
+    setTimeout(() => {
+        gerarPDF(`disciplinas_${turno}.pdf`, 'print-preview');
+    }, 1000);
 }
 
 function gerarPDF(nomeArquivo = 'horarios_uesc.pdf', elementoId = 'print-preview') {
