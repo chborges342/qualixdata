@@ -484,10 +484,19 @@ function initDisciplinas() {
             if (currentEditingItemId) {
                 // MODO DE EDIÇÃO
                 const disciplinaRef = window.dbRef(window.firebaseDB, `disciplinas/${currentEditingItemId}`);
-                disciplinaData.updatedAt = window.dbServerTimestamp;
-                await window.dbUpdate(disciplinaRef, disciplinaData);
+                const updateData = {
+        nome: disciplinaData.nome,
+        codigo: disciplinaData.codigo,
+        cargaHoraria: disciplinaData.cargaHoraria,
+        tipo: disciplinaData.tipo, // Novo campo
+        turnos: disciplinaData.turnos,
+        semestresPorTurno: disciplinaData.semestresPorTurno,
+        updatedAt: { '.sv': 'timestamp' } // Formato especial para timestamp
+    };
 
-                showAlert('Disciplina atualizada com sucesso!', 'success');
+    await window.dbUpdate(disciplinaRef, updateData);
+    showAlert('Disciplina atualizada com sucesso!', 'success');
+
             } else {
                 // MODO DE CRIAÇÃO
                 const disciplinaListRef = window.dbRef(window.firebaseDB, 'disciplinas');
