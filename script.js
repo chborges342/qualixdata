@@ -1437,22 +1437,25 @@ async function saveHorario() {
             idDisciplina: disciplinaId,
             idProfessor: professorId,
             idSala: salaId,
-            updatedAt: window.dbServerTimestamp // Para rastrear a última modificação
+            updatedAt: { '.sv': 'timestamp' }  // Formato correto para timestamp
         };
 
         if (existingHorario) {
             // Atualiza o horário existente no Firebase
             const horarioRef = window.dbRef(window.firebaseDB, `horarios/${existingHorario.id}`);
-            await window.dbSet(horarioRef, horarioData); // set para sobrescrever
+            await window.dbUpdate(horarioRef, horarioData);
         } else {
             // Adiciona um novo horário no Firebase
             const horarioListRef = window.dbRef(window.firebaseDB, 'horarios');
-            await window.dbPush(horarioListRef, horarioData); // push para novo ID
+            const newHorario = {
+                ...horarioData,
+                createdAt: { '.sv': 'timestamp' }  // Formato correto para timestamp
+            };
+            await window.dbPush(horarioListRef, newHorario);
         }
 
-        closeHorarioModal(); // NOVO: Esta função já reseta o modal e esconde o botão de delete
+        closeHorarioModal();
         showAlert('Horário salvo com sucesso!', 'success');
-        // renderHorariosGrid será chamado pelo listener do Firebase
     } catch (error) {
         console.error('Erro ao salvar horário:', error);
         showAlert('Erro ao salvar horário: ' + error.message, 'error');
