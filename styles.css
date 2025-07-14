@@ -1035,3 +1035,38 @@ body {
         print-color-adjust: exact;
     }
 }
+
+/* Adicione ao seu arquivo CSS existente */
+
+/* Estilo para o loading */
+.loading-pdf {
+    padding: 2rem;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Garante que o preview ocupe toda a largura */
+#print-preview {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Evita quebras de página dentro dos grupos */
+.semestre-group {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+/* Ajusta o tamanho da tabela para caber na página */
+.disciplinas-table {
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+/* Esconde os botões na impressão */
+.no-print {
+    @media print {
+        display: none !important;
+    }
+}
