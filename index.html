@@ -444,9 +444,9 @@
                                     <option value="">Selecione uma turma</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" id="btn-print-turma">
-                                <i class="fas fa-print"></i>
-                                Gerar Horário da Turma
+                            <button class="btn btn-primary" onclick="gerarPDF('horario_turma_' + document.getElementById('print-turma').value + '.pdf')">
+                                <i class="fas fa-file-pdf"></i>
+                                Gerar PDF
                             </button>
                         </div>
                     </div>
@@ -464,10 +464,10 @@
                                     <option value="">Selecione um professor</option>
                                 </select>
                             </div>
-                            <button class="btn btn-primary" id="btn-print-professor">
-                                <i class="fas fa-print"></i>
-                                Gerar Horário do Professor
-                            </button>
+                            <button class="btn btn-primary" onclick="gerarPDF('horario_professor_' + document.getElementById('print-professor').value + '.pdf')">
+                                <i class="fas fa-file-pdf"></i>
+                                Gerar PDF
+                                </button>
                         </div>
                     </div>
 
@@ -489,9 +489,9 @@
             </div>
 
             <p>Gere a lista completa de disciplinas organizadas por semestre</p>
-            <button class="btn btn-primary" id="btn-print-disciplinas">
-                <i class="fas fa-print"></i>
-                Gerar Lista de Disciplinas
+            <button class="btn btn-primary" onclick="gerarPDF('disciplinas_' + document.getElementById('print-turno').value + '.pdf')">
+                <i class="fas fa-file-pdf"></i>
+                Gerar PDF
             </button>
         </div>
     </div>
