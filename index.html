@@ -442,23 +442,36 @@
                 <div class="impressao-options">
                     <!-- Opção de Turma (existente) -->
                     <div class="option-card">
-                        <div class="option-header">
-                            <i class="fas fa-users"></i>
-                            <h3>Horário por Turma</h3>
-                        </div>
-                        <div class="option-content">
-                            <div class="form-group">
-                                <label for="print-turma">Selecionar Turma:</label>
-                                <select id="print-turma">
-                                    <option value="">Selecione uma turma</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="gerarHorarioTurmaPDF()">
-                                <i class="fas fa-file-pdf"></i>
-                                Gerar PDF
-                            </button>
-                        </div>
-                    </div>
+    <div class="option-header">
+        <i class="fas fa-users"></i>
+        <h3>Horário por Turma</h3>
+    </div>
+    <div class="option-content">
+        <div class="print-controls">
+            <label for="print-option">Selecione o modo:</label>
+            <select id="print-option" class="form-control">
+                <option value="">-- Selecione --</option>
+                <option value="turma">Turma Específica</option>
+                <option value="matutino">Todas as Turmas - Matutino</option>
+                <option value="noturno">Todas as Turmas - Noturno</option>
+            </select>
+        </div>
+
+        <div id="turma-select-container" class="form-group">
+            <label for="print-turma">Selecionar Turma:</label>
+            <select id="print-turma">
+                <option value="">Selecione uma turma</option>
+            </select>
+        </div>
+
+        <button id="btn-generate-print" class="btn btn-primary">
+            <i class="fas fa-eye"></i> Visualizar
+        </button>
+        <button class="btn btn-secondary" onclick="printPage()">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+</div>
 
                     <!-- Opção de Professor (existente) -->
                     <div class="option-card">
