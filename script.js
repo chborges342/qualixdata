@@ -1775,64 +1775,79 @@ async function generateDisciplinasPrint(turnoSelecionado) {
 // Atualize a função initImpressao para incluir o novo botão
 // ============ NOVAS FUNÇÕES DE IMPRESSÃO ============
 
+// ============ SISTEMA DE IMPRESSÃO ============
+
 function initImpressao() {
-    setupPrintControls();
-    initPrintButtons();
-}
+    // Verifica se estamos na página de impressão
+    if (!document.getElementById('impressao')) return;
 
-function setupPrintControls() {
-    const printOption = document.getElementById('print-option');
-    const turmaSelectContainer = document.getElementById('turma-select-container');
-    
-    // Atualiza as opções de turma
-    updatePrintTurmaSelect();
-    
-    // Mostra/oculta o seletor de turma conforme a opção
-    if (printOption) {
-        printOption.addEventListener('change', function() {
-            turmaSelectContainer.style.display = 
-                this.value === 'turma' ? 'block' : 'none';
-        });
-    }
-    
-    // Configura o botão de gerar impressão
-    const generatePrintBtn = document.getElementById('btn-generate-print');
-    if (generatePrintBtn) {
-        generatePrintBtn.addEventListener('click', function() {
-            const option = printOption.value;
-            const turmaId = document.getElementById('print-turma').value;
-            
-            if (!option) {
-                showAlert('Selecione uma opção de impressão', 'warning');
-                return;
-            }
-            
-            if (option === 'turma' && !turmaId) {
-                showAlert('Selecione uma turma para imprimir', 'warning');
-                return;
-            }
-            
-            if (option === 'turma') {
-                generateTurmaPrint(turmaId);
-            } else if (option === 'matutino' || option === 'noturno') {
-                generateTurnoPrint(option);
-            }
-        });
-    }
-}
+    // Atualiza os selects
+    updatePrintSelects();
 
-function updatePrintTurmaSelect() {
-    const select = document.getElementById('print-turma');
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">-- Selecione a Turma --</option>';
-    
-    toArray(appData.turmas).forEach(turma => {
-        const option = document.createElement('option');
-        option.value = turma.id;
-        option.textContent = turma.nome;
-        select.appendChild(option);
+    // Configura os botões
+    document.getElementById('btn-print-turma')?.addEventListener('click', () => {
+        const turmaId = document.getElementById('print-turma').value;
+        if (!turmaId) {
+            showAlert('Selecione uma turma primeiro', 'warning');
+            return;
+        }
+        generateTurmaPrint(turmaId);
     });
+
+    document.getElementById('btn-print-professor')?.addEventListener('click', () => {
+        const professorId = document.getElementById('print-professor').value;
+        if (!professorId) {
+            showAlert('Selecione um professor primeiro', 'warning');
+            return;
+        }
+        generateProfessorPrint(professorId);
+    });
+
+    document.getElementById('btn-print-disciplinas')?.addEventListener('click', () => {
+        const turno = document.getElementById('print-turno').value;
+        generateDisciplinasPrint(turno);
+    });
+
+    console.log('Sistema de impressão inicializado');
+}
+
+function updatePrintSelects() {
+    // Atualiza select de turmas
+    const turmaSelect = document.getElementById('print-turma');
+    if (turmaSelect) {
+        turmaSelect.innerHTML = '<option value="">Selecione uma turma</option>';
+        toArray(appData.turmas).forEach(turma => {
+            const option = document.createElement('option');
+            option.value = turma.id;
+            option.textContent = turma.nome;
+            turmaSelect.appendChild(option);
+        });
+    }
+
+    // Atualiza select de professores
+    const professorSelect = document.getElementById('print-professor');
+    if (professorSelect) {
+        professorSelect.innerHTML = '<option value="">Selecione um professor</option>';
+        toArray(appData.professores).forEach(professor => {
+            const option = document.createElement('option');
+            option.value = professor.id;
+            option.textContent = professor.nome;
+            professorSelect.appendChild(option);
+        });
+    }
+}
+
+function printPage() {
+    const preview = document.getElementById('print-preview');
+    if (!preview || preview.innerHTML.trim() === '') {
+        showAlert('Nada para imprimir. Gere uma visualização primeiro.', 'warning');
+        return;
+    }
+    window.print();
+}
+
+function closePrintPreview() {
+    document.getElementById('print-preview').innerHTML = '';
 }
 
 function initPrintButtons() {
