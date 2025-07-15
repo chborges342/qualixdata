@@ -1212,3 +1212,119 @@ body {
         display: none !important;
     }
 }
+
+/* ========== IMPRESSÃO DE HORÁRIOS COM CORES ========== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #print-preview, #print-preview * {
+        visibility: visible;
+    }
+    
+    #print-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+        margin: 0;
+        border: none;
+        box-shadow: none;
+        background: white;
+        font-size: 12px;
+    }
+
+    /* Mantém as cores das disciplinas na impressão */
+    .horario-slot.ocupado {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        background-color: inherit !important;
+    }
+
+    /* Estilo da grade de horários para impressão */
+    .grade-print {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        page-break-inside: avoid;
+    }
+
+    .grade-print th, 
+    .grade-print td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .grade-print th {
+        background-color: #f2f2f2 !important;
+        font-weight: bold;
+    }
+
+    .grade-print .horario-label {
+        background-color: #f8f9fa !important;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    /* Cores específicas para cada disciplina */
+    .disciplina-color-1 { background-color: #d4edff !important; }
+    .disciplina-color-2 { background-color: #ffe8d4 !important; }
+    .disciplina-color-3 { background-color: #e8ffd4 !important; }
+    .disciplina-color-4 { background-color: #ffd4f3 !important; }
+    .disciplina-color-5 { background-color: #d4fff5 !important; }
+    /* Adicione mais cores conforme necessário */
+
+    /* Melhora a legibilidade do texto */
+    .grade-print .horario-info {
+        padding: 4px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .grade-print .disciplina {
+        font-weight: bold;
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .grade-print .professor,
+    .grade-print .sala {
+        font-size: 10px;
+    }
+
+    /* Cabeçalho da impressão */
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #333;
+    }
+
+    .print-header h2 {
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .print-header p {
+        margin: 3px 0;
+        color: #666;
+        font-size: 13px;
+    }
+
+    /* Remove elementos não necessários na impressão */
+    .no-print, .btn-print, .print-controls {
+        display: none !important;
+    }
+
+    /* Garante que a tabela não quebre entre páginas */
+    .grade-print {
+        page-break-inside: avoid;
+    }
+}
