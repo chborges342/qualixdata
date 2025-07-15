@@ -1945,23 +1945,7 @@ function generateTurmaPrint(turmaId) {
     
     html += '</tbody></table>';
     
-    // Legenda de cores (opcional)
-    const disciplinasUnicas = [...new Set(horariosData.map(h => h.idDisciplina))];
-    if (disciplinasUnicas.length > 0) {
-        html += '<div class="legenda-cores"><h4>Legenda:</h4><div class="legenda-itens">';
-        
-        disciplinasUnicas.forEach(idDisciplina => {
-            const disciplina = appData.disciplinas[idDisciplina];
-            html += `
-                <div class="legenda-item">
-                    <span class="legenda-cor ${coresDisciplinas[idDisciplina]}"></span>
-                    <span>${disciplina?.nome || 'Disciplina'}</span>
-                </div>
-            `;
-        });
-        
-        html += '</div></div>';
-    }
+   
     
     html += `
         <div class="print-footer">
