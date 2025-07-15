@@ -14,6 +14,32 @@ let appData = {
 let currentEditingItemId = null;
 let currentEditingFormId = null;
 
+// ... (código existente) ...
+
+// Variáveis globais para o usuário e UI de autenticação
+let currentUser = null; // Para armazenar o objeto do usuário logado
+
+// Referências aos elementos da UI de autenticação
+const authFormsSection = document.getElementById('authForms');
+const loggedInAppContent = document.getElementById('loggedInAppContent');
+const authStatusIndicator = document.getElementById('authStatusIndicator');
+const userStatusElement = document.getElementById('userStatus');
+
+// Referências aos botões e campos de autenticação
+const btnRegister = document.getElementById('btnRegister');
+const registerEmailInput = document.getElementById('registerEmail');
+const registerPasswordInput = document.getElementById('registerPassword');
+
+const btnLogin = document.getElementById('btnLogin');
+const loginEmailInput = document.getElementById('loginEmail');
+const loginPasswordInput = document.getElementById('loginPassword');
+
+const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+const btnLogout = document.getElementById('btnLogout');
+
+// ... (resto do seu código) ...
+
+
 // Configurações dos horários
 const HORARIOS_CONFIG = {
     matutino: {
@@ -181,6 +207,172 @@ function cancelEditing() {
 }
 
 
+// ... (código existente - Funções utilitárias, etc.) ...
+
+// ===========================================
+// FUNÇÕES DE AUTENTICAÇÃO
+// ===========================================
+
+async function handleRegister() {
+    const email = registerEmailInput.value;
+    const password = registerPasswordInput.value;
+
+    if (!email || !password) {
+        showAlert('Por favor, preencha o e-mail e a senha para registro.', 'error');
+        return;
+    }
+
+    try {
+        await window.authCreateUserWithEmailAndPassword(window.firebaseAuth, email, password);
+        showAlert('Conta criada com sucesso! Você está logado.', 'success');
+        // A UI será atualizada automaticamente pelo observador de estado de autenticação
+    } catch (error) {
+        console.error("Erro no registro:", error);
+        let errorMessage = "Erro ao criar conta.";
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = 'Este e-mail já está em uso.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'E-mail inválido.';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'A senha é muito fraca (mínimo 6 caracteres).';
+                break;
+            default:
+                errorMessage = 'Erro desconhecido: ' + error.message;
+        }
+        showAlert(errorMessage, 'error');
+    }
+}
+
+async function handleLogin() {
+    const email = loginEmailInput.value;
+    const password = loginPasswordInput.value;
+
+    if (!email || !password) {
+        showAlert('Por favor, preencha o e-mail e a senha para login.', 'error');
+        return;
+    }
+
+    try {
+        await window.authSignInWithEmailAndPassword(window.firebaseAuth, email, password);
+        showAlert('Login realizado com sucesso!', 'success');
+        // A UI será atualizada automaticamente pelo observador de estado de autenticação
+    } catch (error) {
+        console.error("Erro no login:", error);
+        let errorMessage = "Erro ao fazer login.";
+        switch (error.code) {
+            case 'auth/invalid-email':
+                errorMessage = 'E-mail inválido.';
+                break;
+            case 'auth/user-disabled':
+                errorMessage = 'Sua conta foi desativada.';
+                break;
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+                errorMessage = 'E-mail ou senha incorretos.';
+                break;
+            default:
+                errorMessage = 'Erro desconhecido: ' + error.message;
+        }
+        showAlert(errorMessage, 'error');
+    }
+}
+
+async function handleGoogleLogin() {
+    const provider = new window.authGoogleAuthProvider();
+    try {
+        await window.authSignInWithPopup(window.firebaseAuth, provider);
+        showAlert('Login com Google realizado com sucesso!', 'success');
+        // A UI será atualizada automaticamente pelo observador de estado de autenticação
+    } catch (error) {
+        console.error("Erro no login com Google:", error);
+        if (error.code === 'auth/popup-closed-by-user') {
+            showAlert('Login com Google cancelado.', 'info');
+        } else {
+            showAlert('Erro ao fazer login com Google: ' + error.message, 'error');
+        }
+    }
+}
+
+async function handleLogout() {
+    try {
+        await window.authSignOut(window.firebaseAuth);
+        showAlert('Você foi desconectado.', 'info');
+        // A UI será atualizada automaticamente pelo observador de estado de autenticação
+    } catch (error) {
+        console.error("Erro ao fazer logout:", error);
+        showAlert('Erro ao fazer logout: ' + error.message, 'error');
+    }
+}
+
+// ... (código existente - Funções de Autenticação, initAuthUIListeners) ...
+
+/**
+ * Atualiza a interface do usuário com base no estado de autenticação.
+ * @param {firebase.User|null} user O objeto do usuário autenticado, ou null se não houver usuário.
+ */
+function updateAppUI(user) {
+    currentUser = user; // Armazena o usuário atual globalmente
+
+    if (user) {
+        // Usuário logado
+        authFormsSection.style.display = 'none'; // Esconde os formulários
+        loggedInAppContent.style.display = 'block'; // Mostra o conteúdo da aplicação
+        authStatusIndicator.textContent = `Logado como: ${user.email || user.displayName}`;
+        userStatusElement.textContent = `Bem-vindo(a), ${user.email || user.displayName}!`;
+        // Limpa os campos de login/registro
+        registerEmailInput.value = '';
+        registerPasswordInput.value = '';
+        loginEmailInput.value = '';
+        loginPasswordInput.value = '';
+
+        // Opcional: Recarregar dados do RTDB após o login se eles fossem específicos do usuário
+        // No seu caso, os listeners do Firebase já carregam tudo independente do usuário, então está OK.
+        // Mas se tivesse dados específicos (ex: 'users/UID/professores'), você chamaria aqui.
+        // updateDashboardCounts(); // Garante que a dashboard seja atualizada
+        // renderProfessoresList(); // Garante que as listas sejam renderizadas se a página de cadastros estiver ativa
+
+    } else {
+        // Usuário não logado
+        authFormsSection.style.display = 'block'; // Mostra os formulários
+        loggedInAppContent.style.display = 'none'; // Esconde o conteúdo da aplicação
+        authStatusIndicator.textContent = 'Não logado';
+        userStatusElement.textContent = ''; // Limpa o status do usuário
+    }
+    console.log("UI atualizada. Usuário:", user ? user.uid : "Nenhum");
+}
+//
+function setupAuthStateObserver() {
+    window.authOnAuthStateChanged(window.firebaseAuth, (user) => {
+        updateAppUI(user);
+        // Opcional: Se initFirebaseListeners só deve rodar uma vez,
+        // mas precisa dos dados carregados antes da UI ser renderizada.
+        // No seu caso, initFirebaseListeners já é chamado em DOMContentLoaded
+        // e os listeners são persistentes, então não precisa chamar aqui novamente.
+        // Mas é importante que a primeira chamada de updateAppUI tenha sido feita
+        // para que a UI reflita o estado antes de qualquer outra renderização.
+    });
+    console.log("Observador de estado de autenticação do Firebase configurado.");
+}
+
+// ... (resto do seu código) ...
+
+
+// ... (resto do seu código) ...
+// ... (código existente - Funções de Autenticação) ...
+
+function initAuthUIListeners() {
+    btnRegister.addEventListener('click', handleRegister);
+    btnLogin.addEventListener('click', handleLogin);
+    btnGoogleLogin.addEventListener('click', handleGoogleLogin);
+    btnLogout.addEventListener('click', handleLogout);
+
+    console.log("Listeners da UI de autenticação inicializados.");
+}
+
+// ... (resto do seu código) ...
 
 
 // Navegação
@@ -2557,6 +2749,8 @@ function initFirebaseListeners() {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    initAuthUIListeners();
+    setupAuthStateObserver();
     initNavigation();
     initTabs();
     initProfessores();
@@ -2568,6 +2762,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializa apenas se estiver na página de impressão
     if (document.getElementById('impressao')) {
         initImpressao();
+        initPrintButtons();
     }
     
     initFirebaseListeners();
