@@ -432,97 +432,87 @@
             </section>
 
             <!-- Impressão Section -->
-            <section id="impressao" class="section">
-                <div class="section-header">
-                    <h2><i class="fas fa-print"></i> Impressão de Horários</h2>
-                    <p>Gere e imprima horários por turma, professor ou lista de disciplinas</p> <!-- Atualizado -->
-                </div>
-
-
-                <div class="impressao-options">
-                    <!-- Opção de Turma (existente) -->
-                    <div class="option-card">
-    <div class="option-header">
-        <i class="fas fa-users"></i>
-        <h3>Horário por Turma</h3>
+            <!-- Impressão Section -->
+<section id="impressao" class="section">
+    <div class="section-header">
+        <h2><i class="fas fa-print"></i> Impressão de Horários</h2>
+        <p>Gere e imprima horários por turma, professor ou lista de disciplinas</p>
     </div>
-    <div class="option-content">
-        <div class="print-controls">
-            <label for="print-option">Selecione o modo:</label>
-            <select id="print-option" class="form-control">
-                <option value="">-- Selecione --</option>
-                <option value="turma">Turma Específica</option>
-                <option value="matutino">Todas as Turmas - Matutino</option>
-                <option value="noturno">Todas as Turmas - Noturno</option>
-            </select>
-        </div>
 
-        <div id="turma-select-container" class="form-group">
-            <label for="print-turma">Selecionar Turma:</label>
-            <select id="print-turma">
-                <option value="">Selecione uma turma</option>
-            </select>
-        </div>
-
-        <button id="btn-generate-print" class="btn btn-primary">
-            <i class="fas fa-eye"></i> Visualizar
-        </button>
-        <button class="btn btn-secondary" onclick="printPage()">
-            <i class="fas fa-print"></i> Imprimir
-        </button>
-    </div>
-</div>
-
-                    <!-- Opção de Professor (existente) -->
-                    <div class="option-card">
-                        <div class="option-header">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <h3>Horário por Professor</h3>
-                        </div>
-                        <div class="option-content">
-                            <div class="form-group">
-                                <label for="print-professor">Selecionar Professor:</label>
-                                <select id="print-professor">
-                                    <option value="">Selecione um professor</option>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="gerarHorarioProfessorPDF()">
-                                <i class="fas fa-file-pdf"></i>
-                                    Gerar PDF
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- NOVA Opção de Lista de Disciplinas -->
-                     <div class="option-card">
-        <div class="option-header">
-            <i class="fas fa-list-ol"></i>
-            <h3>Lista de Disciplinas</h3>
-        </div>
-        <div class="option-content">
-            <!-- FILTRO POR TURNO AQUI -->
-            <div class="print-controls">
-                <label for="print-turno">Filtrar por turno:</label>
-                <select id="print-turno" onchange="atualizarListaDisciplinas()">
-                    <option value="todos">Todos</option>
-                    <option value="matutino">Matutino</option>
-                    <option value="noturno">Noturno</option>
-                </select>
+    <div class="impressao-options">
+        <!-- Opção de Turma -->
+        <div class="option-card">
+            <div class="option-header">
+                <i class="fas fa-users"></i>
+                <h3>Horário por Turma</h3>
             </div>
+            <div class="option-content">
+                <div class="form-group">
+                    <label for="print-turma">Selecionar Turma:</label>
+                    <select id="print-turma" class="form-control">
+                        <option value="">Selecione uma turma</option>
+                    </select>
+                </div>
+                <button id="btn-print-turma" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Visualizar
+                </button>
+                <button class="btn btn-secondary" onclick="printPage()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
 
-            <p>Gere a lista completa de disciplinas organizadas por semestre</p>
-            <button class="btn btn-primary" onclick="gerarListaDisciplinasPDF()">
-                <i class="fas fa-file-pdf"></i>
-                Gerar PDF
-            </button>
+        <!-- Opção de Professor -->
+        <div class="option-card">
+            <div class="option-header">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>Horário por Professor</h3>
+            </div>
+            <div class="option-content">
+                <div class="form-group">
+                    <label for="print-professor">Selecionar Professor:</label>
+                    <select id="print-professor" class="form-control">
+                        <option value="">Selecione um professor</option>
+                    </select>
+                </div>
+                <button id="btn-print-professor" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Visualizar
+                </button>
+                <button class="btn btn-secondary" onclick="printPage()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+
+        <!-- Opção de Lista de Disciplinas -->
+        <div class="option-card">
+            <div class="option-header">
+                <i class="fas fa-list-ol"></i>
+                <h3>Lista de Disciplinas</h3>
+            </div>
+            <div class="option-content">
+                <div class="form-group">
+                    <label for="print-turno">Filtrar por turno:</label>
+                    <select id="print-turno" class="form-control">
+                        <option value="todos">Todos</option>
+                        <option value="matutino">Matutino</option>
+                        <option value="noturno">Noturno</option>
+                    </select>
+                </div>
+                <button id="btn-print-disciplinas" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Visualizar
+                </button>
+                <button class="btn btn-secondary" onclick="printPage()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-                <div id="print-preview" class="print-preview">
-                    <!-- Preview será exibido aqui -->
-                </div>
-            </section>
+    <div id="print-preview" class="print-preview">
+        <!-- Preview será exibido aqui -->
+    </div>
+</section>
         </main>
 
 
