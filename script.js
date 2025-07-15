@@ -1773,11 +1773,70 @@ async function generateDisciplinasPrint(turnoSelecionado) {
 }
 
 // Atualize a função initImpressao para incluir o novo botão
-function initImpressao() {
-    // Verifica se estamos na página de impressão
-    if (!document.getElementById('impressao')) return;
+// ============ NOVAS FUNÇÕES DE IMPRESSÃO ============
 
-    // Elementos com verificação de existência
+function initImpressao() {
+    setupPrintControls();
+    initPrintButtons();
+}
+
+function setupPrintControls() {
+    const printOption = document.getElementById('print-option');
+    const turmaSelectContainer = document.getElementById('turma-select-container');
+    
+    // Atualiza as opções de turma
+    updatePrintTurmaSelect();
+    
+    // Mostra/oculta o seletor de turma conforme a opção
+    if (printOption) {
+        printOption.addEventListener('change', function() {
+            turmaSelectContainer.style.display = 
+                this.value === 'turma' ? 'block' : 'none';
+        });
+    }
+    
+    // Configura o botão de gerar impressão
+    const generatePrintBtn = document.getElementById('btn-generate-print');
+    if (generatePrintBtn) {
+        generatePrintBtn.addEventListener('click', function() {
+            const option = printOption.value;
+            const turmaId = document.getElementById('print-turma').value;
+            
+            if (!option) {
+                showAlert('Selecione uma opção de impressão', 'warning');
+                return;
+            }
+            
+            if (option === 'turma' && !turmaId) {
+                showAlert('Selecione uma turma para imprimir', 'warning');
+                return;
+            }
+            
+            if (option === 'turma') {
+                generateTurmaPrint(turmaId);
+            } else if (option === 'matutino' || option === 'noturno') {
+                generateTurnoPrint(option);
+            }
+        });
+    }
+}
+
+function updatePrintTurmaSelect() {
+    const select = document.getElementById('print-turma');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Selecione a Turma --</option>';
+    
+    toArray(appData.turmas).forEach(turma => {
+        const option = document.createElement('option');
+        option.value = turma.id;
+        option.textContent = turma.nome;
+        select.appendChild(option);
+    });
+}
+
+function initPrintButtons() {
+    // Configura os botões de impressão específicos
     const printTurmaBtn = document.getElementById('btn-print-turma');
     const printProfessorBtn = document.getElementById('btn-print-professor');
     const printDisciplinasBtn = document.getElementById('btn-print-disciplinas');
@@ -1805,8 +1864,7 @@ function initImpressao() {
         });
     }
 
-   if (printDisciplinasBtn && printTurnoSelect) {
-        // Evento único para ambos os casos
+    if (printDisciplinasBtn && printTurnoSelect) {
         const handleDisciplinasClick = () => {
             const turnoSelecionado = printTurnoSelect.value;
             generateDisciplinasPrint(turnoSelecionado);
@@ -1816,7 +1874,6 @@ function initImpressao() {
         printTurnoSelect.addEventListener('change', handleDisciplinasClick);
     }
 }
-
 function generateTurmaPrint(turmaId) {
     const turma = appData.turmas[turmaId];
     if (!turma) return;
