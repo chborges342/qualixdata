@@ -1963,6 +1963,158 @@ function generateTurmaPrint(turmaId) {
     preview.innerHTML = html;
     preview.scrollIntoView({ behavior: 'smooth' });
 }
+
+function generateTurnoPrint(turno) {
+    const preview = document.getElementById('print-preview');
+    preview.classList.remove('hidden');
+    
+    const config = HORARIOS_CONFIG[turno];
+    const turmasDoTurno = toArray(appData.turmas).filter(t => t.turno === turno);
+    
+    let html = `
+        <div class="print-header">
+            <h2>Horário de Aulas - Turno ${turno.charAt(0).toUpperCase() + turno.slice(1)}</h2>
+            <p>Curso: Ciências Econômicas - UESC</p>
+            <p>Gerado em: ${formatDateTime(new Date())}</p>
+        </div>
+    `;
+    
+    // Para cada turma do turno
+    turmasDoTurno.forEach(turma => {
+        const horariosData = toArray(appData.horarios).filter(h => h.idTurma === turma.id);
+        
+        // Mapeamento de cores para disciplinas (por turma)
+        const coresDisciplinas = {};
+        const coresDisponiveis = [
+            'disciplina-color-1', // Azul claro
+            'disciplina-color-2', // Laranja claro
+            'disciplina-color-3', // Verde claro
+            'disciplina-color-4', // Rosa claro
+            'disciplina-color-5'  // Ciano claro
+        ];
+        
+        let indiceCor = 0;
+        
+        // Mapear cores para as disciplinas desta turma
+        horariosData.forEach(horario => {
+            if (!coresDisciplinas[horario.idDisciplina]) {
+                coresDisciplinas[horario.idDisciplina] = coresDisponiveis[indiceCor];
+                indiceCor = (indiceCor + 1) % coresDisponiveis.length;
+            }
+        });
+
+        html += `
+            <div class="turma-section">
+                <h3 class="turma-title">Turma: ${turma.nome}</h3>
+                <table class="grade-horarios print-table">
+                    <thead>
+                        <tr>
+                            <th>Horário</th>
+        `;
+        
+        config.dias.forEach(dia => {
+            html += `<th>${formatDiaName(dia)}</th>`;
+        });
+        
+        html += '</tr></thead><tbody>';
+        
+        if (turno === 'matutino') {
+            config.blocos.forEach(bloco => {
+                html += `<tr><td class="horario-label">${bloco.inicio} - ${bloco.fim}</td>`;
+                
+                config.dias.forEach(dia => {
+                    const horario = horariosData.find(h => h.diaSemana === dia && h.bloco === bloco.id);
+                    
+                    if (horario) {
+                        const disciplina = appData.disciplinas[horario.idDisciplina];
+                        const professor = appData.professores[horario.idProfessor];
+                        const sala = appData.salas[horario.idSala];
+                        const corDisciplina = coresDisciplinas[horario.idDisciplina];
+                        
+                        html += `
+                            <td class="horario-cell ${corDisciplina}">
+                                <div class="print-horario-info">
+                                    <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
+                                    <div class="professor">${professor?.nome || 'N/A'}</div>
+                                    <div class="sala">${sala?.nome || 'N/A'}</div>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        html += '<td class="horario-cell"></td>';
+                    }
+                });
+                
+                html += '</tr>';
+            });
+        } else {
+            // Noturno
+            const maxBlocos = Math.max(...config.dias.map(dia => config.blocos[dia].length));
+            
+            for (let i = 0; i < maxBlocos; i++) {
+                html += '<tr>';
+                
+                const horarios = config.dias.map(dia => {
+                    const bloco = config.blocos[dia][i];
+                    return bloco ? `${bloco.inicio} - ${bloco.fim}` : '';
+                }).filter(h => h);
+                
+                const horarioUnico = [...new Set(horarios)];
+                html += `<td class="horario-label">${horarioUnico.join(' / ')}</td>`;
+                
+                config.dias.forEach(dia => {
+                    const bloco = config.blocos[dia][i];
+                    
+                    if (bloco) {
+                        const horario = horariosData.find(h => h.diaSemana === dia && h.bloco === bloco.id);
+                        
+                        if (horario) {
+                            const disciplina = appData.disciplinas[horario.idDisciplina];
+                            const professor = appData.professores[horario.idProfessor];
+                            const sala = appData.salas[horario.idSala];
+                            const corDisciplina = coresDisciplinas[horario.idDisciplina];
+                            
+                            html += `
+                                <td class="horario-cell ${corDisciplina}">
+                                    <div class="print-horario-info">
+                                        <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
+                                        <div class="professor">${professor?.nome || 'N/A'}</div>
+                                        <div class="sala">${sala?.nome || 'N/A'}</div>
+                                    </div>
+                                </td>
+                            `;
+                        } else {
+                            html += '<td class="horario-cell"></td>';
+                        }
+                    } else {
+                        html += '<td class="horario-cell disabled"></td>';
+                    }
+                });
+                
+                html += '</tr>';
+            }
+        }
+        
+        html += '</tbody></table></div>'; // Fecha turma-section
+    });
+    
+    html += `
+        <div class="print-footer">
+            <button class="btn btn-primary" onclick="printPage()">
+                <i class="fas fa-print"></i>
+                Imprimir
+            </button>
+            <button class="btn btn-secondary" onclick="closePrintPreview()">
+                <i class="fas fa-times"></i>
+                Fechar
+            </button>
+        </div>
+    `;
+    
+    preview.innerHTML = html;
+    preview.scrollIntoView({ behavior: 'smooth' });
+}
+
 // script.js - PARTE 6
 
 function generateProfessorPrint(professorId) {
