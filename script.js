@@ -1304,27 +1304,7 @@ function updateHorarioSelects() {
     });
 }
 
-function updatePrintSelects() {
-    // Update print turma select
-    const printTurmaSelect = document.getElementById('print-turma');
-    printTurmaSelect.innerHTML = '<option value="">Selecione uma turma</option>';
-    toArray(appData.turmas).forEach(turma => {
-        const option = document.createElement('option');
-        option.value = turma.id;
-        option.textContent = turma.nome;
-        printTurmaSelect.appendChild(option);
-    });
 
-    // Update print professor select
-    const printProfessorSelect = document.getElementById('print-professor');
-    printProfessorSelect.innerHTML = '<option value="">Selecione um professor</option>';
-    toArray(appData.professores).forEach(professor => {
-        const option = document.createElement('option');
-        option.value = professor.id;
-        option.textContent = professor.nome;
-        printProfessorSelect.appendChild(option);
-    });
-}
 
 // Horários - Funcionalidades avançadas
 function initHorarios() {
