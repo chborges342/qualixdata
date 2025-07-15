@@ -1399,3 +1399,40 @@ body {
 .legenda-cor.disciplina-color-3 { background-color: #e8ffd4; }
 .legenda-cor.disciplina-color-4 { background-color: #ffd4f3; }
 .legenda-cor.disciplina-color-5 { background-color: #d4fff5; }
+
+/* Estilos para impressão agrupada por turno */
+.turma-section {
+    margin-bottom: 30px;
+    page-break-inside: avoid;
+}
+
+.turma-title {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin: 20px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Ajustes para impressão de múltiplas turmas */
+@media print {
+    .turma-section {
+        margin-bottom: 20px;
+    }
+    
+    .turma-title {
+        font-size: 1rem;
+        margin: 15px 0 8px;
+    }
+    
+    /* Garante que cada turma comece em uma nova página se não couber */
+    .turma-section {
+        page-break-after: auto;
+        page-break-inside: avoid;
+    }
+    
+    /* Remove o footer da impressão */
+    .print-footer {
+        display: none !important;
+    }
+}
