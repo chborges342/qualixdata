@@ -2698,6 +2698,42 @@ document.addEventListener('DOMContentLoaded', () => {
         initImpressao();
         initPrintButtons();
     }
+
+    // ===========================================
+// EXPOSIÇÃO DE FUNÇÕES PARA O ESCOPO GLOBAL (window)
+// NECESSÁRIO QUANDO USANDO type="module" NOS SCRIPTS
+// ===========================================
+
+// Funções de Utilitárias e UI chamadas diretamente do HTML
+window.showAlert = showAlert; // Se showAlert for chamada de onclick
+window.cancelEditing = cancelEditing; // Se cancelEditing for chamada de onclick
+
+// Funções de CRUD/Edição chamadas diretamente do HTML
+window.editProfessor = editProfessor;
+window.deleteProfessor = deleteProfessor;
+window.editDisciplina = editDisciplina;
+window.deleteDisciplina = deleteDisciplina;
+window.editTurma = editTurma;
+window.deleteTurma = deleteTurma;
+window.editSala = editSala;
+window.deleteSala = deleteSala;
+
+// Funções de Horários chamadas diretamente do HTML
+window.editHorarioSlot = editHorarioSlot;
+
+// Funções de Geração de PDF e Impressão chamadas diretamente do HTML
+// EXATAMENTE O QUE PRECISAMOS PARA printPage e closePrintPreview:
+window.printPage = printPage; // Torna sua função printPage global
+window.closePrintPreview = closePrintPreview; // Torna sua função closePrintPreview global
+
+// Estas também são chamadas do HTML, então precisam ser globais:
+window.gerarHorarioTurmaPDF = gerarHorarioTurmaPDF;
+window.gerarHorarioProfessorPDF = gerarHorarioProfessorPDF;
+window.gerarListaDisciplinasPDF = gerarListaDisciplinasPDF;
+// A função gerarPDF em si é chamada pelas suas funções gerarHorarioTurmaPDF, etc.
+// Se ela também for chamada diretamente de algum onclick no HTML, adicione:
+// window.gerarPDF = gerarPDF;
+
     
     initFirebaseListeners();
     console.log('Sistema inicializado!');
