@@ -1328,3 +1328,74 @@ body {
         page-break-inside: avoid;
     }
 }
+
+/* ========== ESTILOS DE IMPRESSÃO COLORIDA ========== */
+@media print {
+    /* Garante que as cores sejam impressas */
+    .disciplina-color-1 { background-color: #d4edff !important; }
+    .disciplina-color-2 { background-color: #ffe8d4 !important; }
+    .disciplina-color-3 { background-color: #e8ffd4 !important; }
+    .disciplina-color-4 { background-color: #ffd4f3 !important; }
+    .disciplina-color-5 { background-color: #d4fff5 !important; }
+    
+    /* Melhora a legibilidade */
+    .print-horario-info .disciplina {
+        font-weight: bold;
+        font-size: 11px;
+    }
+    
+    .print-horario-info .professor,
+    .print-horario-info .sala {
+        font-size: 10px;
+    }
+    
+    /* Remove elementos não necessários */
+    .print-footer, .legenda-cores {
+        display: none !important;
+    }
+    
+    /* Garante que as cores apareçam */
+    .horario-cell {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* Estilos para a legenda (visualização na tela) */
+.legenda-cores {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.legenda-cores h4 {
+    margin-bottom: 10px;
+}
+
+.legenda-itens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legenda-cor {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+/* Defina as mesmas cores usadas na tabela */
+.legenda-cor.disciplina-color-1 { background-color: #d4edff; }
+.legenda-cor.disciplina-color-2 { background-color: #ffe8d4; }
+.legenda-cor.disciplina-color-3 { background-color: #e8ffd4; }
+.legenda-cor.disciplina-color-4 { background-color: #ffd4f3; }
+.legenda-cor.disciplina-color-5 { background-color: #d4fff5; }
