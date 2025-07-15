@@ -2604,43 +2604,7 @@ async function gerarListaDisciplinasPDF() {
     }, 1000);
 }
 
-function gerarPDF(nomeArquivo = 'horarios_uesc.pdf', elementoId = 'print-preview') {
-    const { jsPDF } = window.jspdf;
-    const elemento = document.getElementById(elementoId);
-    
-    if (!elemento || elemento.innerHTML.trim() === '') {
-        showAlert('Nenhum conteúdo encontrado para gerar PDF', 'error');
-        return;
-    }
 
-    // Mostrar elemento temporariamente se estiver oculto
-    const estiloOriginal = elemento.style.display;
-    elemento.style.display = 'block';
-
-    html2canvas(elemento, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        scrollY: -window.scrollY,
-        windowWidth: elemento.scrollWidth,
-        windowHeight: elemento.scrollHeight
-    }).then(canvas => {
-        // Restaurar estilo original
-        elemento.style.display = estiloOriginal;
-
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 190; // Largura com margens
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        pdf.save(nomeArquivo);
-    }).catch(error => {
-        console.error('Erro ao gerar PDF:', error);
-        showAlert('Erro ao gerar PDF: ' + error.message, 'error');
-        elemento.style.display = estiloOriginal;
-    });
-}
 
 
 // script.js - PARTE 7
