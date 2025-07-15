@@ -2609,16 +2609,6 @@ async function gerarListaDisciplinasPDF() {
 
 // script.js - PARTE 7
 
-function printPage() {
-    window.print();
-}
-
-function closePrintPreview() {
-    const preview = document.getElementById('print-preview');
-    preview.classList.add('hidden');
-    preview.innerHTML = '';
-}
-
 
 function initFirebaseListeners() {
     // Listener para Professores
