@@ -1827,6 +1827,26 @@ function generateTurmaPrint(turmaId) {
     const config = HORARIOS_CONFIG[turma.turno];
     const horariosData = toArray(appData.horarios).filter(h => h.idTurma === turmaId);
     
+    // Mapeamento de cores para disciplinas
+    const coresDisciplinas = {};
+    const coresDisponiveis = [
+        'disciplina-color-1', // Azul claro
+        'disciplina-color-2', // Laranja claro
+        'disciplina-color-3', // Verde claro
+        'disciplina-color-4', // Rosa claro
+        'disciplina-color-5'  // Ciano claro
+    ];
+    
+    let indiceCor = 0;
+    
+    // Primeiro, mapeamos todas as disciplinas para cores
+    horariosData.forEach(horario => {
+        if (!coresDisciplinas[horario.idDisciplina]) {
+            coresDisciplinas[horario.idDisciplina] = coresDisponiveis[indiceCor];
+            indiceCor = (indiceCor + 1) % coresDisponiveis.length;
+        }
+    });
+
     let html = `
         <div class="print-header">
             <h2>Horário de Aulas - ${turma.nome}</h2>
@@ -1840,7 +1860,6 @@ function generateTurmaPrint(turmaId) {
                     <th>Horário</th>
     `;
     
-    // A lógica de dias é a mesma para matutino e noturno no header da tabela
     config.dias.forEach(dia => {
         html += `<th>${formatDiaName(dia)}</th>`;
     });
@@ -1853,23 +1872,25 @@ function generateTurmaPrint(turmaId) {
             
             config.dias.forEach(dia => {
                 const horario = horariosData.find(h => h.diaSemana === dia && h.bloco === bloco.id);
-                html += '<td class="horario-cell">';
                 
                 if (horario) {
                     const disciplina = appData.disciplinas[horario.idDisciplina];
                     const professor = appData.professores[horario.idProfessor];
                     const sala = appData.salas[horario.idSala];
+                    const corDisciplina = coresDisciplinas[horario.idDisciplina];
                     
                     html += `
-                        <div class="print-horario-info">
-                            <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
-                            <div class="professor">${professor?.nome || 'N/A'}</div>
-                            <div class="sala">Sala: ${sala?.nome || 'N/A'}</div>
-                        </div>
+                        <td class="horario-cell ${corDisciplina}">
+                            <div class="print-horario-info">
+                                <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
+                                <div class="professor">${professor?.nome || 'N/A'}</div>
+                                <div class="sala">Sala: ${sala?.nome || 'N/A'}</div>
+                            </div>
+                        </td>
                     `;
+                } else {
+                    html += '<td class="horario-cell"></td>';
                 }
-                
-                html += '</td>';
             });
             
             html += '</tr>';
@@ -1891,7 +1912,6 @@ function generateTurmaPrint(turmaId) {
             
             config.dias.forEach(dia => {
                 const bloco = config.blocos[dia][i];
-                html += '<td class="horario-cell">';
                 
                 if (bloco) {
                     const horario = horariosData.find(h => h.diaSemana === dia && h.bloco === bloco.id);
@@ -1900,18 +1920,23 @@ function generateTurmaPrint(turmaId) {
                         const disciplina = appData.disciplinas[horario.idDisciplina];
                         const professor = appData.professores[horario.idProfessor];
                         const sala = appData.salas[horario.idSala];
+                        const corDisciplina = coresDisciplinas[horario.idDisciplina];
                         
                         html += `
-                            <div class="print-horario-info">
-                                <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
-                                <div class="professor">${professor?.nome || 'N/A'}</div>
-                                <div class="sala">Sala: ${sala?.nome || 'N/A'}</div>
-                            </div>
+                            <td class="horario-cell ${corDisciplina}">
+                                <div class="print-horario-info">
+                                    <div class="disciplina">${disciplina?.nome || 'N/A'}</div>
+                                    <div class="professor">${professor?.nome || 'N/A'}</div>
+                                    <div class="sala">Sala: ${sala?.nome || 'N/A'}</div>
+                                </div>
+                            </td>
                         `;
+                    } else {
+                        html += '<td class="horario-cell"></td>';
                     }
+                } else {
+                    html += '<td class="horario-cell disabled"></td>';
                 }
-                
-                html += '</td>';
             });
             
             html += '</tr>';
@@ -1919,6 +1944,24 @@ function generateTurmaPrint(turmaId) {
     }
     
     html += '</tbody></table>';
+    
+    // Legenda de cores (opcional)
+    const disciplinasUnicas = [...new Set(horariosData.map(h => h.idDisciplina))];
+    if (disciplinasUnicas.length > 0) {
+        html += '<div class="legenda-cores"><h4>Legenda:</h4><div class="legenda-itens">';
+        
+        disciplinasUnicas.forEach(idDisciplina => {
+            const disciplina = appData.disciplinas[idDisciplina];
+            html += `
+                <div class="legenda-item">
+                    <span class="legenda-cor ${coresDisciplinas[idDisciplina]}"></span>
+                    <span>${disciplina?.nome || 'Disciplina'}</span>
+                </div>
+            `;
+        });
+        
+        html += '</div></div>';
+    }
     
     html += `
         <div class="print-footer">
@@ -1934,8 +1977,6 @@ function generateTurmaPrint(turmaId) {
     `;
     
     preview.innerHTML = html;
-    
-    // Scroll to preview
     preview.scrollIntoView({ behavior: 'smooth' });
 }
 // script.js - PARTE 6
