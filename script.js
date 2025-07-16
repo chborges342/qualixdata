@@ -2067,6 +2067,8 @@ function generateTurmaPrint(turmaId) {
     
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
+    preview.style.display = 'block'; // <--- ADICIONE ESTA LINHA AQUI!
+    // ... o restante da sua função generateTurmaPrint ...
     
     const config = HORARIOS_CONFIG[turma.turno];
     const horariosData = toArray(appData.horarios).filter(h => h.idTurma === turmaId);
@@ -2367,6 +2369,9 @@ function generateProfessorPrint(professorId) {
     
     const preview = document.getElementById('print-preview');
     preview.classList.remove('hidden');
+    preview.style.display = 'block'; // <--- ADICIONE ESTA LINHA AQUI!
+    // ... o restante da sua função generateProfessorPrint ...
+
     
     const horariosData = toArray(appData.horarios).filter(h => h.idProfessor === professorId);
     
